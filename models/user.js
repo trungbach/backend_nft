@@ -8,14 +8,14 @@ var User = function (user) {
     this.public_address = user.public_address;
     this.username = user.username;
 };
-User.createUser = function createUser(newCategory, result) {
+User.createUser = function createUser(newCategory) {
     return new Promise((resolve, reject) => {
         sql.query("INSERT INTO users set ?", newCategory, function (err, res) {
             return err ? reject(err) : resolve(res.insertId);
         });
     });
 };
-User.findById = function findById(id, result) {
+User.findById = function findById(id) {
     return new Promise((resolve, reject) => {
         sql.query("Select * from users where id = ? ", id, function (err, res) {
             return err ? reject(err) : resolve(res[0]);
@@ -26,8 +26,6 @@ User.findById = function findById(id, result) {
 User.findByAddress = function findByAddress(address) {
     return new Promise((resolve, reject) => {
         sql.query("Select * from users where public_address = ? ", address, function (err, res) {
-            err ? console.log("Looix") :
-            console.log(res[0])
             return err ? resolve(null) : resolve(res.length > 0 ? res[0] : null);
         }
         );
@@ -45,16 +43,12 @@ User.getAllUser = function getAllUser(result) {
         }
     });
 };
-User.updateById = function (id, user, result) {
+User.updateById = function (id, user) {
+    return new Promise((resolve, reject) => {
     sql.query("UPDATE users SET nonce = ? WHERE id = ?", [user.nonce, id], function (err, res) {
-        if (err) {
-            console.log("error: ", err);
-            result(null, err);
-        }
-        else {
-            result(null, res);
-        }
+        return err ? resolve(null) : resolve(res);
     });
+});
 };
 
 module.exports = User;
