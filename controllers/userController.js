@@ -38,7 +38,8 @@ exports.check_public_address = async function (request, res) {
     const { public_address } = request.body;
     const user = await User.findByAddress(public_address);
     if (user) {
-        return user
+        res.send({ message: "Success", data: user })
+        return
     }
     var new_user = new User({
         public_address: public_address,

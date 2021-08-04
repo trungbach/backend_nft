@@ -26,7 +26,9 @@ User.findById = function findById(id, result) {
 User.findByAddress = function findByAddress(address) {
     return new Promise((resolve, reject) => {
         sql.query("Select * from users where public_address = ? ", address, function (err, res) {
-            return err ? reject(err) : resolve(res[0]);
+            err ? console.log("Looix") :
+            console.log(res[0])
+            return err ? resolve(null) : resolve(res.length > 0 ? res[0] : null);
         }
         );
     });
