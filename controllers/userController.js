@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const ethereumjs = require('ethereumjs-util');
 const ethSig = require('eth-sig-util');
+const buffer = require('buffer');
+const Buffer = buffer.Buffer;
 const recoverPersonalSignature = ethSig.recoverPersonalSignature
 
 exports.list_all_user = function (req, res) {
@@ -57,11 +59,10 @@ exports.check_public_address = async function (request, res) {
 exports.signature_verification = async function (request, res) {
     const { public_address, signature } = request.body;
     const user = await User.findByAddress(public_address);
-    const msg = user.nonce;
+    const msg = `I am signing my one-time nonce: ${user.nonce}`
     // We now are in possession of msg, public_address and signature. We
     // can perform an elliptic curve signature verification with ecrecover
-    console.log(msg)
-    const msgBufferHex = ethereumjs.bufferToHex(new Buffer.from(msg+'', 'utf8'));
+    const msgBufferHex = ethereumjs.bufferToHex(Buffer.from(msg, 'utf8'));
     const address = recoverPersonalSignature({
         data: msgBufferHex,
         sig: signature,
