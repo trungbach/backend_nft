@@ -45,12 +45,8 @@ exports.check_public_address = async function (request, res) {
         nonce: `${Math.floor(Math.random() * 1000000)}`,
         username: "Unknown Name"
     })
-    User.createUser(new_user, function (err, task) {
-        if (err)
-            res.status(400)
-                .send({ message: "Error", data: err });
-        res.send({ message: "Success", data: task })
-    });
+    var id = await User.createUser(new_user);
+    var newUser = await User.findById(id);
     res.send({ message: "Success", data: newUser })
 }
 

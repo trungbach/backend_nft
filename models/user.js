@@ -9,16 +9,10 @@ var User = function (user) {
     this.username = user.username;
 };
 User.createUser = function createUser(newCategory, result) {
-    sql.query("INSERT INTO users set ?", newCategory, function (err, res) {
-
-        if (err) {
-            console.log("error: ", err);
-            result(err, null);
-        }
-        else {
-            console.log("insertId", res.insertId)
-            result(null, res.insertId);
-        }
+    return new Promise((resolve, reject) => {
+        sql.query("INSERT INTO users set ?", newCategory, function (err, res) {
+            return err ? reject(err) : resolve(res.insertId);
+        });
     });
 };
 User.findById = function findById(id, result) {
