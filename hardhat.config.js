@@ -1,9 +1,10 @@
 require("@nomiclabs/hardhat-waffle");
+require("dotenv").config();
 const fs = require('fs');
-const privateKey = fs.readFileSync(".secret").toString().trim() || "01234567890123456789";
+const privateKey = process.env.ACCOUNT.trim() || "01234567890123456789";
 
 // infuraId is optional if you are using Infura RPC
-const infuraId = fs.readFileSync(".infuraid").toString().trim() || "";
+const infuraId = process.env.INFURA_ID.trim() || "";
 
 module.exports = {
   defaultNetwork: "hardhat",
