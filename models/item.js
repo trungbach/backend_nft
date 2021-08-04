@@ -16,6 +16,7 @@ var Item = function(item){
     this.collection_id = item.collection_id;
     this.block_id = item.block_id;
     this.sell = item.sell;
+    this.category_id = item.category_id
     this.created_at = new Date()
 };
 Item.createItem = function createItem(item, result) {
@@ -41,16 +42,42 @@ Item.getItemById = function createUser(itemId, result) {
         }
     });
 };
-Item.getAllItem = function getAllItem(result) {
-    sql.query(`Select * from items WHERE sell = ${SELL}`, function (err, res) {
-        if(err) {
-            console.log("error: ", err);
-            result(null, err);
-        }
-        else{
-            result(null, res);
-        }
-    });
+Item.getAllItem = function getAllItem(params, result) {
+    const {key, min_price, max_price, collection_id, category_id} = params
+    var str = ""
+    if(key){
+        str+= ` AND name LIKE '%${key}%'`
+    }
+    if(min_price){
+        str+= ` AND price >= ${min_price}`
+    }
+    if(max_price){
+        str+= ` AND price <= ${max_price}`
+    }
+    if(collection_id){
+        str+= ` AND collection_id = ${collection_id}`
+    }
+    if(category_id){
+        sql.query(`Select * from items WHERE sell = ${SELL} ${str}`, function (err, res) {
+            if(err) {
+                console.log("error: ", err);
+                result(null, err);
+            }
+            else{
+                result(null, res);
+            }
+        });
+    }else{
+        sql.query(`Select * from items WHERE sell = ${ASSET} ${str}`, function (err, res) {
+            if(err) {
+                console.log("error: ", err);
+                result(null, err);
+            }
+            else{
+                result(null, res);
+            }
+        });
+    }
 };
 Item.updateById = function(id, item, result){
     sql.query("UPDATE items SET name = ? WHERE id = ?", [item.name, id], function (err, res) {
@@ -76,5 +103,4 @@ Item.remove = function(id, result){
         }
     });
 };
-
 module.exports= Item;

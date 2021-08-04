@@ -11,4 +11,7 @@ module.exports = function (app) {
         .get(todoList.read_a_collection)
         .put(auth, todoList.update_a_collection)
         .delete(auth, todoList.delete_a_collection);
+
+    app.route('/collections-rankings')
+        .get(todoList.rankings)
 };

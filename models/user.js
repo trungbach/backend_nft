@@ -27,8 +27,7 @@ User.findByAddress = function findByAddress(address) {
     return new Promise((resolve, reject) => {
         sql.query("Select * from users where public_address = ? ", address, function (err, res) {
             return err ? resolve(null) : resolve(res.length > 0 ? res[0] : null);
-        }
-        );
+        });
     });
 };
 User.getAllUser = function getAllUser(result) {

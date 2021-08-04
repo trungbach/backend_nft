@@ -11,7 +11,6 @@ var Collection = function (collection) {
     this.description = collection.description;
     this.created = collection.created;
     this.category_id = collection.category_id;
-    this.created_at = new Date()
 };
 
 Collection.createCollection = function createCollection(collection, result) {
@@ -25,20 +24,15 @@ Collection.createCollection = function createCollection(collection, result) {
         }
     });
 };
-Collection.getCollectionById = function createUser(itemId, result) {
-    sql.query("Select * from collections where id = ? ", itemId, function (err, res) {
-        if (err) {
-            console.log("error: ", err);
-            result(err, null);
-        }
-        else {
-            result(null, res[0]);
-
-        }
+Collection.getCollectionById = function createUser(itemId) {
+    return new Promise((resolve, reject) => {
+        sql.query("Select * from collections where id = ? ", itemId, function (err, res) {
+            return err ? resolve(null) : resolve(res.length > 0 ? res[0] : null);
+        });
     });
 };
-Collection.getAllCollection = function getAllCollection(result) {
-    sql.query("Select * from collections", function (err, res) {
+Collection.getAllCollection = function getAllCollection(name, result) {
+    sql.query(`Select * from collections where name LIKE '%${name}%'`, function (err, res) {
         if (err) {
             console.log("error: ", err);
             result(null, err);
@@ -74,5 +68,21 @@ Collection.remove = function (id, result) {
         }
     });
 };
-
+Collection.updateInTime = function updateInTime(params, result) {
+    const { start_time, end_time, category_id } = params
+    sql.query(`SELECT DISTINCT *
+    FROM collections
+    LEFT JOIN items
+    ON collections.id = items.collection_id
+    ${category_id ? `WHERE collections.category_id = ${category_id}` : ''}
+    ORDER BY (select count(items.id) from items WHERE items.updated_at >= '${start_time}' AND items.updated_at <= '${end_time}')`, function (err, res) {
+        if (err) {
+            console.log("error: ", err);
+            result(null, err);
+        }
+        else {
+            result(null, res);
+        }
+    });
+};
 module.exports = Collection;

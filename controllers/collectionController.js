@@ -2,10 +2,12 @@
 var slug = require('slug')
 
 var Collection = require('../models/collection');
-var User = require('../models/user');
+var Item = require('../models/item');
 
 exports.list_all_collection = function (req, res) {
-    Collection.getAllCollection(function (err, task) {
+    const { key } = req.query
+    var newKey = key ? key : ""
+    Collection.getAllCollection(newKey, function (err, task) {
         if (err)
             res.status(400)
                 .send({ message: "Error", data: err });
@@ -16,7 +18,6 @@ exports.list_all_collection = function (req, res) {
 exports.create_a_collection = async function (req, res) {
     const { user_id, body } = req
     const { name, logo_url, banner_url, description, category_id } = body
-    var user = await User.findById(user_id);
     var new_collection = {
         name,
         logo_url,
@@ -24,9 +25,8 @@ exports.create_a_collection = async function (req, res) {
         description,
         category_id,
         slug: slug(name),
-        owner: user.public_address,
-        created: user.public_address,
-        created_at: new Date()
+        owner: user_id,
+        created: user_id,
     }
     Collection.createCollection(new_collection, function (err, task) {
         if (err)
@@ -47,8 +47,15 @@ exports.read_a_collection = function (req, res) {
 };
 
 
-exports.update_a_collection = function (req, res) {
-    Collection.updateById(req.params.collectionId, req.body, function (err, task) {
+exports.update_a_collection = async function (req, res) {
+    const { user_id, body, params } = req
+    var collection = await Collection.getCollectionById(params.collectionId)
+    if (user_id != collection.created) {
+        res.status(400)
+            .send({ message: "Permission denied" });
+        return;
+    }
+    Collection.updateById(params.collectionId, body, function (err, task) {
         if (err)
             res.status(400)
                 .send({ message: "Error", data: err });
@@ -63,5 +70,14 @@ exports.delete_a_collection = function (req, res) {
             res.status(400)
                 .send({ message: "Error", data: err });
         res.json({ message: 'Collection successfully deleted' });
+    });
+};
+
+exports.rankings = function (req, res) {
+    Collection.updateInTime(req.query, function (err, task) {
+        if (err)
+            res.status(400)
+                .send({ message: "Error", data: err });
+        res.send({ message: "Success", data: task })
     });
 };

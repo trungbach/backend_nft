@@ -4,7 +4,7 @@ var Item = require('../models/item');
 var User = require('../models/user');
 
 exports.list_all_item = function (req, res) {
-    Item.getAllItem(function (err, task) {
+    Item.getAllItem(req.query, function (err, task) {
         if (err)
             res.status(400)
                 .send({ message: "Error", data: err });
@@ -14,7 +14,7 @@ exports.list_all_item = function (req, res) {
 
 exports.create_a_item = async function (req, res) {
     const { user_id, body } = req
-    const { name, image_url, price, symbol, collection_id, block_id } = body
+    const { name, image_url, price, symbol, collection_id, block_id, category_id } = body
     var user = await User.findById(user_id);
     var new_item = {
         name,
@@ -25,6 +25,7 @@ exports.create_a_item = async function (req, res) {
         owner: user.public_address,
         created: user.public_address,
         collection_id,
+        category_id,
         block_id,
         created_at: new Date()
     }
