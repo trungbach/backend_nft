@@ -37,13 +37,10 @@ exports.create_a_collection = async function (req, res) {
 };
 
 
-exports.read_a_collection = function (req, res) {
-    Collection.getCollectionById(req.params.collectionId, function (err, task) {
-        if (err)
-            res.status(400)
-                .send({ message: "Error", data: err });
-        res.send({ message: "Success", data: task })
-    });
+exports.read_a_collection = async function (req, res) {
+    const { user_id, body, params } = req
+    var collection = await Collection.getCollectionById(params.collectionId)
+    res.send({ message: "Success", data: collection })
 };
 
 
