@@ -9,7 +9,9 @@ module.exports = function (app) {
         .post(auth, todoList.create_a_item);
 
     app.route('/items/:itemId')
-        .get(todoList.read_a_item);
-        // .put(auth, todoList.update_a_item)
-        // .delete(auth, todoList.delete_a_item);
+        .get(auth, todoList.read_a_item);
+
+    app.route('/favorite-items')
+        .get(auth, todoList.list_favorite_item);
+
 };

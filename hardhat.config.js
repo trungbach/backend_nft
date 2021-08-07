@@ -30,6 +30,11 @@ module.exports = {
       // url: "https://rpc-mumbai.matic.today",
       accounts: [privateKey]
     },
+    binancetest: {
+      url: "https://data-seed-prebsc-1-s1.binance.org:8545",
+      chainId: 97,
+      accounts: [privateKey]
+    },
   },
   solidity: {
     version: "0.8.4",

@@ -12,6 +12,15 @@ exports.list_all_item = function (req, res) {
     });
 };
 
+exports.list_favorite_item = function (req, res) {
+    Item.getFavoriteItem(req.user_id, function (err, task) {
+        if (err)
+            res.status(400)
+                .send({ message: "Error", data: err });
+        res.send({ message: "Success", data: task })
+    });
+};
+
 exports.create_a_item = async function (req, res) {
     const { user_id, body } = req
     const { name, image_url, price, symbol, collection_id, block_id, category_id } = body
@@ -27,6 +36,7 @@ exports.create_a_item = async function (req, res) {
         collection_id,
         category_id,
         block_id,
+        sell: 1,
         created_at: new Date()
     }
     Item.createItem(new_item, function (err, task) {
@@ -39,7 +49,8 @@ exports.create_a_item = async function (req, res) {
 
 
 exports.read_a_item = function (req, res) {
-    Item.getItemById(req.params.itemId, function (err, task) {
+    const { user_id, params } = req
+    Item.getItemById(params.itemId, user_id, function (err, task) {
         if (err)
             res.status(400)
                 .send({ message: "Error", data: err });

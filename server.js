@@ -29,6 +29,7 @@ var collectionRoutes = require('./routes/collectionRoutes');
 var itemRoutes = require('./routes/itemRoutes');
 var userRoutes = require('./routes/userRoutes');
 var fileRoutes = require('./routes/fileRoutes');
+var favoriteRoutes = require('./routes/favoriteRoutes');
 
 routes(app); //register the route
 routesNft(app);
@@ -36,3 +37,4 @@ collectionRoutes(app)
 itemRoutes(app)
 userRoutes(app)
 fileRoutes(app)
+favoriteRoutes(app)
