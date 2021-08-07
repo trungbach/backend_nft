@@ -48,14 +48,13 @@ exports.create_a_item = async function (req, res) {
 };
 
 
-exports.read_a_item = function (req, res) {
+exports.read_a_item = async function (req, res) {
     const { user_id, params } = req
-    Item.getItemById(params.itemId, user_id, function (err, task) {
-        if (err)
-            res.status(400)
-                .send({ message: "Error", data: err });
-        res.json(task);
-    });
+    var task = await Item.getItemById(params.itemId, user_id);
+    if (task == null)
+        res.status(400)
+            .send({ message: "Error" });
+    res.json(task);
 };
 
 

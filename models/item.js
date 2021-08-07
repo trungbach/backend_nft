@@ -30,17 +30,11 @@ Item.createItem = function createItem(item, result) {
         }
     });
 };
-Item.getItemById = function createUser(itemId, user_id, result) {
-    sql.query("Select *, (select favorites.id from favorites where favorites.user_id = ? AND favorites.item_id = ? ) as is_favorite from items where id = ? ", [user_id, itemId, itemId], function (err, res) {
-        if (err) {
-            console.log("error: ", err);
-            result(err, null);
-        }
-        else {
-            console.log("error: ", res);
-            result(null, res[0]);
-
-        }
+Item.getItemById = function getItemById(itemId, user_id, result) {
+    return new Promise((resolve, reject) => {
+        sql.query("Select *, (select favorites.id from favorites where favorites.user_id = ? AND favorites.item_id = ? ) as is_favorite from items where id = ? ", [user_id, itemId, itemId], function (err, res) {
+            return err ? resolve(null) : resolve(res[0]);
+        });
     });
 };
 Item.getAllItem = function getAllItem(params, result) {
@@ -81,6 +75,13 @@ Item.updateById = function (id, item, result) {
         else {
             result(null, res);
         }
+    });
+};
+Item.updateFavoriteById = function (id, number_favorites) {
+    return new Promise((resolve, reject) => {
+        sql.query("UPDATE items SET number_favorites = ? WHERE id = ?", [number_favorites, id], function (err, res) {
+            return err ? resolve(null) : resolve(res);
+        });
     });
 };
 Item.remove = function (id, result) {
