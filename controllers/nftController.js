@@ -106,7 +106,8 @@ exports.list_item_bought = async function (req, res) {
 
 exports.detail_item = async function (req, res) {
     var id = req.params.id
-    const provider = new ethers.getDefaultProvider("https://rpc-mumbai.maticvigil.com/")
+    var infuraId = process.env.INFURA_ID
+    const provider = new ethers.getDefaultProvider(`https://ropsten.infura.io/v3/${infuraId}`)
     const tokenContract = new ethers.Contract(config.nftaddress, NFT.abi, provider)
     const marketContract = new ethers.Contract(config.nftmarketaddress, Market.abi, provider)
     const data = await marketContract.fetchDetailItem(id)
