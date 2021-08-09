@@ -14,4 +14,7 @@ module.exports = function (app) {
 
     app.route('/collections-rankings')
         .get(todoList.rankings)
+
+    app.route('/my-collections')
+        .get(auth, todoList.my_collections)
 };

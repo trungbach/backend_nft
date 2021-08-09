@@ -43,6 +43,12 @@ exports.read_a_collection = async function (req, res) {
     res.send({ message: "Success", data: collection })
 };
 
+exports.my_collections = async function (req, res) {
+    const { user_id } = req
+    var collection = await Collection.getMyCollections(user_id)
+    res.send({ message: "Success", data: collection })
+};
+
 
 exports.update_a_collection = async function (req, res) {
     const { user_id, body, params } = req

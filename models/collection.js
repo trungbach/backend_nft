@@ -85,4 +85,11 @@ Collection.updateInTime = function updateInTime(params, result) {
         }
     });
 };
+Collection.getMyCollections = function getMyCollections(user_id) {
+    return new Promise((resolve, reject) => {
+        sql.query("Select * from collections where owner = ? ", user_id, function (err, res) {
+            return err ? resolve(null) : resolve(res);
+        });
+    });
+};
 module.exports = Collection;
