@@ -9,7 +9,7 @@ const NFT = require('../artifacts/contracts/NFT.sol/NFT.json');
 const Market = require('../artifacts/contracts/Market.sol/NFTMarket.json');
 
 exports.list_all_items = async function (req, res) {
-    const provider = new ethers.getDefaultProvider("https://rpc-mumbai.maticvigil.com/")
+    const provider = new ethers.getDefaultProvider()
     const tokenContract = new ethers.Contract(config.nftaddress, NFT.abi, provider)
     const marketContract = new ethers.Contract(config.nftmarketaddress, Market.abi, provider)
     const data = await marketContract.fetchMarketItems()
@@ -102,4 +102,26 @@ exports.list_item_bought = async function (req, res) {
       return item
     }))
     res.send({ message: "Success", data: items })
+};
+
+exports.detail_item = async function (req, res) {
+    var id = req.params.id
+    const provider = new ethers.getDefaultProvider("https://rpc-mumbai.maticvigil.com/")
+    const tokenContract = new ethers.Contract(config.nftaddress, NFT.abi, provider)
+    const marketContract = new ethers.Contract(config.nftmarketaddress, Market.abi, provider)
+    const data = await marketContract.fetchDetailItem(id)
+
+    const tokenUri = await tokenContract.tokenURI(data.tokenId)
+    const meta = await axios.get(tokenUri)
+    let price = ethers.utils.formatUnits(data.price.toString(), 'ether')
+    let item = {
+        price,
+        tokenId: data.tokenId.toNumber(),
+        seller: data.seller,
+        owner: data.owner,
+        image: meta.data.image,
+        name: meta.data.name,
+        description: meta.data.description,
+    }
+    res.send({ message: "Success", data: item })
 };

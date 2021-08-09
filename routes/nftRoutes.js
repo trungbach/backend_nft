@@ -14,4 +14,7 @@ module.exports = function (app) {
 
     app.route('/create_item')
         .post(todoList.create_item);
+
+    app.route('/item-by-id/:id')
+        .get(todoList.detail_item);
 };
