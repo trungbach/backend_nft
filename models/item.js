@@ -66,8 +66,8 @@ Item.getAllItem = function getAllItem(params, result) {
         }
     });
 };
-Item.updateById = function (id, item, result) {
-    sql.query("UPDATE items SET name = ? WHERE id = ?", [item.name, id], function (err, res) {
+Item.updateById = function (id, public_address, result) {
+    sql.query(`UPDATE items SET owner = ?, sell = ${ASSET} WHERE id = ?`, [public_address, id], function (err, res) {
         if (err) {
             console.log("error: ", err);
             result(null, err);
@@ -112,5 +112,19 @@ Item.getFavoriteItem = function getFavoriteItem(user_id, result) {
         }
     });
 
+};
+Item.createdItems = function (public_address) {
+    return new Promise((resolve, reject) => {
+        sql.query("Select * from items where created = ? ", [public_address], function (err, res) {
+            return err ? resolve(null) : resolve(res);
+        });
+    });
+};
+Item.assetItems = function (public_address) {
+    return new Promise((resolve, reject) => {
+        sql.query("Select * from items where created != ? AND owner = ? ", [public_address, public_address], function (err, res) {
+            return err ? resolve(null) : resolve(res);
+        });
+    });
 };
 module.exports = Item;

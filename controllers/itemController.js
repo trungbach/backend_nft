@@ -58,13 +58,31 @@ exports.read_a_item = async function (req, res) {
 };
 
 
-exports.update_a_item = function (req, res) {
-    Item.updateById(req.params.itemId, new Item(req.body), function (err, task) {
+exports.update_a_item = async function (req, res) {
+    const { user_id, params } = req
+    var user = await User.findById(user_id);
+    Item.updateById(params.itemId, user.public_address, function (err, task) {
         if (err)
             res.status(400)
                 .send({ message: "Error", data: err });
         res.json(task);
     });
+};
+
+
+exports.my_items = async function (req, res) {
+    const { user_id } = req
+    var user = await User.findById(user_id);
+    var task = await Item.createdItems(user.public_address);
+    res.send({ message: "Success", data: task })
+};
+
+exports.my_assets = async function (req, res) {
+    const { user_id } = req
+    var user = await User.findById(user_id);
+    console.log(user)
+    var task = await Item.assetItems(user.public_address);
+    res.send({ message: "Success", data: task })
 };
 
 
