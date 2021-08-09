@@ -70,7 +70,7 @@ Collection.remove = function (id, result) {
 };
 Collection.updateInTime = function updateInTime(params, result) {
     const { start_time, end_time, category_id } = params
-    sql.query(`SELECT DISTINCT *
+    sql.query(`SELECT DISTINCT collections.*
     FROM collections
     LEFT JOIN items
     ON collections.id = items.collection_id
