@@ -1,4 +1,4 @@
 
-  exports.nftmarketaddress = "0x69DC16741968E14067F0c7f2d9b8224bDCb8327E"
-  exports.nftaddress = "0x8746c3348B73C029cFDca24D01A068fA84a4F775"
+  exports.nftmarketaddress = "0x33B748b50e71E8815A28ae568f002Aa58D6E7EDa"
+  exports.nftaddress = "0x7f88561b4a6f047A33E9F7a4F8D63eF84c33e191"
   
