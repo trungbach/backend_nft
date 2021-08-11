@@ -28,7 +28,9 @@ module.exports = {
       // Infura
       url: `https://ropsten.infura.io/v3/${infuraId}`,
       // url: "https://rpc-mumbai.matic.today",
-      accounts: [privateKey]
+      accounts: [privateKey],
+      gas: 2100000, 
+      gasPrice: 8000000000
     },
     binancetest: {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
