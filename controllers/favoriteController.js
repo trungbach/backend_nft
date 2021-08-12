@@ -19,7 +19,7 @@ exports.create_a_favorite = async function (req, res) {
     var new_favorite = await Favorite.createFavorite(new_favorite);
     if (new_favorite != null) {
         var item = await Item.getItemById(item_id);
-        await Item.updateFavoriteById(item_id, Number(item.number_favorites) + 1);
+        await Item.updateFavoriteById(item_id, item.number_favorites != null ? Number(item.number_favorites) + 1 : 1);
         res.send({ message: "Success", data: new_favorite })
     }
 };
@@ -27,10 +27,15 @@ exports.create_a_favorite = async function (req, res) {
 exports.delete_a_favorite = async function (req, res) {
     const { user_id, body } = req
     const { item_id } = body
-    var favorite = await Favorite.remove(user_id, item_id);
+    var new_favorite = {
+        user_id,
+        item_id,
+    }
+    var favorite = await Favorite.findFavorite(new_favorite);
     if(favorite != null){
         var item = await Item.getItemById(item_id);
         await Item.updateFavoriteById(item_id, Number(item.number_favorites) - 1);
+        await Favorite.remove(user_id, item_id);
         res.json({ message: 'Favorite successfully deleted' });
     }else{
         res.status(400)

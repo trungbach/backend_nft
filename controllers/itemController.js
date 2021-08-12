@@ -50,7 +50,7 @@ exports.create_a_item = async function (req, res) {
 
 exports.read_a_item = async function (req, res) {
     const { user_id, params } = req
-    var task = await Item.getItemById(params.itemId, user_id);
+    var task = await Item.getDetailItem(params.itemId, user_id);
     if (task == null)
         res.status(400)
             .send({ message: "Error" });

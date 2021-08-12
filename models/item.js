@@ -40,7 +40,19 @@ Item.createItem = function createItem(item, result) {
         }
     });
 };
-Item.getItemById = function getItemById(itemId, user_id) {
+Item.getItemById = function getItemById(itemId) {
+    return new Promise((resolve, reject) => {
+        sql.query(`Select *
+        from items 
+        where items.id = ${itemId}`,
+            function (err, res) {
+                console.log(err)
+                return err ? resolve(null) : resolve(res[0]);
+            });
+    });
+};
+
+Item.getDetailItem = function getDetailItem(itemId, user_id) {
     return new Promise((resolve, reject) => {
         sql.query(`Select items.*, users.username as user_name, users.id as user_id, collections.name as collection_name, collections.logo_url as collection_logo, collections.description as collection_description,
          (select favorites.id from favorites where favorites.user_id = ${user_id} AND favorites.item_id = ${itemId} ) as is_favorite 
