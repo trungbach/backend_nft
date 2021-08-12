@@ -7,9 +7,9 @@ const SELL = 1
 const ASSET = 0
 //item filter
 const CREATED_SORT = 1
-const PRICE_INCREASE_SORT=2
-const PRICE_REDUCED_SORT=3
-const FAVORITE_SORT=4
+const PRICE_INCREASE_SORT = 2
+const PRICE_REDUCED_SORT = 3
+const FAVORITE_SORT = 4
 const OLDEST_SORT = 5
 // const SOLD_SORT = 6
 
@@ -42,14 +42,18 @@ Item.createItem = function createItem(item, result) {
 };
 Item.getItemById = function getItemById(itemId, user_id) {
     return new Promise((resolve, reject) => {
-        sql.query(`Select items.*, users.username as user_name, users.id as user_id, collections.name as collection_name, (select favorites.id from favorites where favorites.user_id = ${user_id} AND favorites.item_id = ${itemId} ) as is_favorite from items, users, collections where items.id = ${itemId} and users.id = ${user_id} and items.collection_id = collections.id LIMIT 1`, function (err, res) {
-            console.log(err)
-            return err ? resolve(null) : resolve(res[0]);
-        });
+        sql.query(`Select items.*, users.username as user_name, users.id as user_id, collections.name as collection_name, collections.logo_url as collection_logo, collections.description as collection_description,
+         (select favorites.id from favorites where favorites.user_id = ${user_id} AND favorites.item_id = ${itemId} ) as is_favorite 
+        from items, users, collections 
+        where items.id = ${itemId} and users.id = ${user_id} and items.collection_id = collections.id LIMIT 1`,
+            function (err, res) {
+                console.log(err)
+                return err ? resolve(null) : resolve(res[0]);
+            });
     });
 };
 Item.getAllItem = function getAllItem(params, result) {
-    const { key, min_price, max_price, collection_id, category_id, sort} = params
+    const { key, min_price, max_price, collection_id, category_id, sort } = params
     var str = ""
     if (key) {
         str += ` AND items.name LIKE '%${key}%'`
@@ -68,15 +72,15 @@ Item.getAllItem = function getAllItem(params, result) {
     }
 
     var orderBy = ""
-    if(sort == CREATED_SORT){
+    if (sort == CREATED_SORT) {
         orderBy = "ORDER BY items.created_at asc"
-    }else if(sort == PRICE_INCREASE_SORT){
+    } else if (sort == PRICE_INCREASE_SORT) {
         orderBy = "ORDER BY items.price asc"
-    }else if(sort == PRICE_REDUCED_SORT){
+    } else if (sort == PRICE_REDUCED_SORT) {
         orderBy = "ORDER BY items.price desc"
-    }else if(sort == OLDEST_SORT){
+    } else if (sort == OLDEST_SORT) {
         orderBy = "ORDER BY items.created_at desc"
-    }else if(sort == FAVORITE_SORT){
+    } else if (sort == FAVORITE_SORT) {
         orderBy = "ORDER BY items.number_favorites desc"
     }
 
