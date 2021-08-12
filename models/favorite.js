@@ -9,7 +9,7 @@ var Favorite = function (favorite) {
 
 Favorite.findFavorite = function findFavorite(favorite) {
     return new Promise((resolve, reject) => {
-        sql.query("Select * from favorites WHERE user_id = ? AND item_id = ?", [favorite.user_id, favorite.item_id], function (err, res) {
+        sql.query("Select * from favorites WHERE user_id = ? AND item_id = ? LIMIT 1", [favorite.user_id, favorite.item_id], function (err, res) {
             return err ? resolve(null) : resolve(res.length > 0 ? res[0] : null);
         });
     });

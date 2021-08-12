@@ -23,4 +23,6 @@ module.exports = function (app) {
     app.route('/my-assets-items')
         .get(auth, todoList.my_assets);
 
+    app.route('/most-favorite-item')
+        .get(todoList.most_favorite_item);
 };

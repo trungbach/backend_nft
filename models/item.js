@@ -1,8 +1,18 @@
 'user strict';
 var sql = require('../config/db.js');
 var slug = require('slug')
+
+//item sell
 const SELL = 1
 const ASSET = 0
+//item filter
+const CREATED_SORT = 1
+const PRICE_INCREASE_SORT=2
+const PRICE_REDUCED_SORT=3
+const FAVORITE_SORT=4
+const OLDEST_SORT = 5
+// const SOLD_SORT = 6
+
 //Item object constructor
 var Item = function (item) {
     this.name = item.name;
@@ -30,33 +40,52 @@ Item.createItem = function createItem(item, result) {
         }
     });
 };
-Item.getItemById = function getItemById(itemId, user_id, result) {
+Item.getItemById = function getItemById(itemId, user_id) {
     return new Promise((resolve, reject) => {
-        sql.query("Select *, (select favorites.id from favorites where favorites.user_id = ? AND favorites.item_id = ? ) as is_favorite from items where id = ? ", [user_id, itemId, itemId], function (err, res) {
+        sql.query(`Select items.*, users.username as user_name, users.id as user_id, collections.name as collection_name, (select favorites.id from favorites where favorites.user_id = ${user_id} AND favorites.item_id = ${itemId} ) as is_favorite from items, users, collections where items.id = ${itemId} and users.id = ${user_id} and items.collection_id = collections.id LIMIT 1`, function (err, res) {
+            console.log(err)
             return err ? resolve(null) : resolve(res[0]);
         });
     });
 };
 Item.getAllItem = function getAllItem(params, result) {
-    const { key, min_price, max_price, collection_id, category_id } = params
+    const { key, min_price, max_price, collection_id, category_id, sort} = params
     var str = ""
     if (key) {
-        str += ` AND name LIKE '%${key}%'`
+        str += ` AND items.name LIKE '%${key}%'`
     }
     if (min_price) {
-        str += ` AND price >= ${min_price}`
+        str += ` AND items.price >= ${min_price}`
     }
     if (max_price) {
-        str += ` AND price <= ${max_price}`
+        str += ` AND items.price <= ${max_price}`
     }
     if (collection_id) {
-        str += ` AND collection_id = ${collection_id}`
+        str += ` AND items.collection_id = ${collection_id}`
     }
     if (category_id) {
-        str += ` AND category_id = ${category_id}`
+        str += ` AND items.category_id = ${category_id}`
     }
 
-    sql.query(`Select * from items WHERE sell = ${SELL} ${str}`, function (err, res) {
+    var orderBy = ""
+    if(sort == CREATED_SORT){
+        orderBy = "ORDER BY items.created_at asc"
+    }else if(sort == PRICE_INCREASE_SORT){
+        orderBy = "ORDER BY items.price asc"
+    }else if(sort == PRICE_REDUCED_SORT){
+        orderBy = "ORDER BY items.price desc"
+    }else if(sort == OLDEST_SORT){
+        orderBy = "ORDER BY items.created_at desc"
+    }else if(sort == FAVORITE_SORT){
+        orderBy = "ORDER BY items.number_favorites desc"
+    }
+
+    sql.query(`Select items.*, collections.name as collection_name 
+    from items 
+    LEFT JOIN collections
+    ON items.collection_id = collections.id
+    WHERE items.sell = ${SELL} ${str} 
+    ${orderBy}`, function (err, res) {
         if (err) {
             console.log("error: ", err);
             result(null, err);
@@ -124,6 +153,13 @@ Item.assetItems = function (public_address) {
     return new Promise((resolve, reject) => {
         sql.query("Select * from items where created != ? AND owner = ? ", [public_address, public_address], function (err, res) {
             return err ? resolve(null) : resolve(res);
+        });
+    });
+};
+Item.getMostFavoriteItem = function () {
+    return new Promise((resolve, reject) => {
+        sql.query("Select * from items ORDER BY items.number_favorites desc LIMIT 1 ", function (err, res) {
+            return err ? resolve(null) : resolve(res[0]);
         });
     });
 };

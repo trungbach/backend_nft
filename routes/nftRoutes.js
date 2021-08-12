@@ -12,8 +12,8 @@ module.exports = function (app) {
     app.route('/my-assets')
         .get(todoList.list_item_bought);
 
-    app.route('/create_item')
-        .post(todoList.create_item);
+    // app.route('/create_item')
+    //     .post(todoList.create_item);
 
     app.route('/itemnft-by-id/:id')
         .get(todoList.detail_item);

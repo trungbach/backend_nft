@@ -26,7 +26,7 @@ Collection.createCollection = function createCollection(collection, result) {
 };
 Collection.getCollectionById = function createUser(itemId) {
     return new Promise((resolve, reject) => {
-        sql.query("Select * from collections where id = ? ", itemId, function (err, res) {
+        sql.query("Select * from collections where id = ? LIMIT 1", itemId, function (err, res) {
             return err ? resolve(null) : resolve(res.length > 0 ? res[0] : null);
         });
     });

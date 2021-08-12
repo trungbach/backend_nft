@@ -23,7 +23,7 @@ Category.createCategory = function createUser(newCategory, result) {
     });
 };
 Category.getCategoryById = function createUser(categoryId, result) {
-    sql.query("Select * from categories where id = ? ", categoryId, function (err, res) {
+    sql.query("Select * from categories where id = ? LIMIT 1", categoryId, function (err, res) {
         if(err) {
             console.log("error: ", err);
             result(err, null);

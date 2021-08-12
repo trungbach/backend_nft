@@ -94,3 +94,8 @@ exports.delete_a_item = function (req, res) {
         res.json({ message: 'Item successfully deleted' });
     });
 };
+
+exports.most_favorite_item = async function (req, res) {
+    var item = await Item.getMostFavoriteItem()
+    res.send({ message: "Success", data: item });
+};
