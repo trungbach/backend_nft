@@ -25,9 +25,8 @@ var Item = function (item) {
     this.created = item.created;
     this.collection_id = item.collection_id;
     this.block_id = item.block_id;
-    this.sell = item.sell;
+    this.sell = SELL;
     this.category_id = item.category_id
-    this.created_at = new Date()
 };
 Item.createItem = function createItem(item, result) {
     sql.query("INSERT INTO items set ?", item, function (err, res) {
@@ -147,7 +146,7 @@ Item.getFavoriteItem = function getFavoriteItem(user_id, result) {
     FROM items
     LEFT JOIN favorites
     ON items.id = favorites.item_id
-    WHERE favorites.user_id = ? AND items.sell = ?`, [user_id, SELL], function (err, res) {
+    WHERE favorites.user_id = ${user_id} AND items.sell = ${SELL}`, function (err, res) {
         if (err) {
             console.log("error: ", err);
             result(null, err);

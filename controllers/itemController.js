@@ -37,7 +37,6 @@ exports.create_a_item = async function (req, res) {
         category_id,
         block_id,
         sell: 1,
-        created_at: new Date()
     }
     Item.createItem(new_item, function (err, task) {
         if (err)
