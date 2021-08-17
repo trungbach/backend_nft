@@ -23,11 +23,11 @@ exports.list_favorite_item = function (req, res) {
 
 exports.create_a_item = async function (req, res) {
     const { user_id, body } = req
-    const { name, image_url, price, symbol, collection_id, block_id, category_id } = body
+    const { name, image_id, price, symbol, collection_id, block_id, category_id } = body
     var user = await User.findById(user_id);
     var new_item = {
         name,
-        image_url,
+        image_id,
         price,
         symbol,
         slug: slug(name),

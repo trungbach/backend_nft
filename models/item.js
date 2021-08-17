@@ -17,7 +17,7 @@ const OLDEST_SORT = 5
 var Item = function (item) {
     this.name = item.name;
     this.slug = slug(item.name);
-    this.image_url = item.image_url;
+    this.image_id = item.image_id;
     this.number_favorites = item.number_favorites;
     this.owner = item.owner;
     this.price = item.price;
@@ -41,8 +41,10 @@ Item.createItem = function createItem(item, result) {
 };
 Item.getItemById = function getItemById(itemId) {
     return new Promise((resolve, reject) => {
-        sql.query(`Select *
+        sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url
         from items 
+        left join files as image
+        on image.id = items.image_id
         where items.id = ${itemId}`,
             function (err, res) {
                 console.log(err)
@@ -51,12 +53,21 @@ Item.getItemById = function getItemById(itemId) {
     });
 };
 
+
 Item.getDetailItem = function getDetailItem(itemId, user_id) {
     return new Promise((resolve, reject) => {
-        sql.query(`Select items.*, users.username as user_name, users.id as user_id, collections.name as collection_name, collections.logo_url as collection_logo, collections.description as collection_description,
+        sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url, users.username as user_name, users.id as user_id, collections.name as collection_name, image_collection.thumb_url as collection_logo, collections.description as collection_description,
          (select favorites.id from favorites where favorites.user_id = ${user_id} AND favorites.item_id = ${itemId} ) as is_favorite 
-        from items, users, collections 
-        where items.id = ${itemId} and users.id = ${user_id} and items.collection_id = collections.id LIMIT 1`,
+        from items 
+        left join collections
+        on items.collection_id = collections.id
+        left join users
+        on users.public_address = items.created
+        left join files as image
+        on image.id = items.image_id
+        left join files as image_collection
+        on image_collection.id = collections.logo_id
+        where items.id = ${itemId} LIMIT 1`,
             function (err, res) {
                 console.log(err)
                 return err ? resolve(null) : resolve(res[0]);
@@ -95,10 +106,12 @@ Item.getAllItem = function getAllItem(params, result) {
         orderBy = "ORDER BY items.number_favorites desc"
     }
 
-    sql.query(`Select items.*, collections.name as collection_name 
+    sql.query(`Select items.*, collections.name as collection_name, image.original_url as image_url, image.thumb_url as image_thumb_url
     from items 
     LEFT JOIN collections
     ON items.collection_id = collections.id
+    LEFT JOIN files as image
+    ON image.id = items.image_id
     WHERE items.sell = ${SELL} ${str} 
     ${orderBy}`, function (err, res) {
         if (err) {
@@ -142,10 +155,12 @@ Item.remove = function (id, result) {
     });
 };
 Item.getFavoriteItem = function getFavoriteItem(user_id, result) {
-    sql.query(`SELECT DISTINCT *
+    sql.query(`SELECT DISTINCT items.*, image.original_url as image_url, image.thumb_url as image_thumb_url
     FROM items
     LEFT JOIN favorites
     ON items.id = favorites.item_id
+    LEFT JOIN files as image
+    ON image.id = items.image_id
     WHERE favorites.user_id = ${user_id} AND items.sell = ${SELL}`, function (err, res) {
         if (err) {
             console.log("error: ", err);
@@ -159,21 +174,34 @@ Item.getFavoriteItem = function getFavoriteItem(user_id, result) {
 };
 Item.createdItems = function (public_address) {
     return new Promise((resolve, reject) => {
-        sql.query("Select * from items where created = ? ", [public_address], function (err, res) {
+        sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url 
+        from items 
+        left join files as image
+        on image.id = items.image_id
+        where items.created = ? `, [public_address], function (err, res) {
             return err ? resolve(null) : resolve(res);
         });
     });
 };
 Item.assetItems = function (public_address) {
     return new Promise((resolve, reject) => {
-        sql.query("Select * from items where created != ? AND owner = ? ", [public_address, public_address], function (err, res) {
+        sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url 
+        from items 
+        left join files as image
+        on image.id = items.image_id
+        where items.created != ?`, [public_address], function (err, res) {
             return err ? resolve(null) : resolve(res);
         });
     });
 };
 Item.getMostFavoriteItem = function () {
     return new Promise((resolve, reject) => {
-        sql.query("Select * from items ORDER BY items.number_favorites desc LIMIT 1 ", function (err, res) {
+        sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url 
+        from items 
+        left join files as image
+        on image.id = items.image_id
+        where items.sell = ${SELL}
+        ORDER BY items.number_favorites desc LIMIT 1 `, function (err, res) {
             return err ? resolve(null) : resolve(res[0]);
         });
     });
