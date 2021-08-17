@@ -71,7 +71,7 @@ exports.signature_verification = async function (request, res) {
     // The signature verification is successful if the address found with
     // ecrecover matches the initial public_address
     if (address.toLowerCase() === public_address.toLowerCase()) {
-        await User.updateById(user.id, { nonce: Math.floor(Math.random() * 1000000) });
+        await User.updateNonceById(user.id, { nonce: Math.floor(Math.random() * 1000000) });
         var token = jwt.sign({ user_id: user.id }, process.env.JWT_SECRET, { expiresIn: process.env.TIME_TOKEN });
         res.send({ message: "Success", data: token })
     } else {
@@ -79,4 +79,15 @@ exports.signature_verification = async function (request, res) {
             .status(401)
             .send({ error: 'Signature verification failed' });
     }
+};
+
+exports.update_profile = async function (request, res) {
+    const { username, avatar_id, cover_id,description, email } = request.body;
+    var user = await User.updateProfile(request.user_id, username, avatar_id, cover_id, description, email);
+    res.send({ message: "Success", data: user })
+};
+
+exports.get_profile = async function (request, res) {
+    var user = await User.getProfileById(request.params.userId);
+    res.send({ message: "Success", data: user })
 };

@@ -2,7 +2,6 @@
 var slug = require('slug')
 
 var Collection = require('../models/collection');
-var Item = require('../models/item');
 
 exports.list_all_collection = function (req, res) {
     const { key } = req.query
@@ -17,16 +16,16 @@ exports.list_all_collection = function (req, res) {
 
 exports.create_a_collection = async function (req, res) {
     const { user_id, body } = req
-    const { name, logo_url, banner_url, description, category_id } = body
+    const { name, description, category_id, logo_id, cover_id } = body
     var new_collection = {
         name,
-        logo_url,
-        banner_url,
         description,
         category_id,
         slug: slug(name),
         owner: user_id,
         created: user_id,
+        logo_id: logo_id,
+        cover_id: cover_id,
     }
     Collection.createCollection(new_collection, function (err, task) {
         if (err)
@@ -37,8 +36,8 @@ exports.create_a_collection = async function (req, res) {
 };
 
 
-exports.read_a_collection = async function (req, res) {
-    const { user_id, body, params } = req
+exports.get_collection_by_id = async function (req, res) {
+    const { params } = req
     var collection = await Collection.getCollectionById(params.collectionId)
     res.send({ message: "Success", data: collection })
 };

@@ -8,7 +8,7 @@ module.exports = function (app) {
         .post(auth, todoList.create_a_collection);
 
     app.route('/collections/:collectionId')
-        .get(todoList.read_a_collection)
+        .get(todoList.get_collection_by_id)
         .put(auth, todoList.update_a_collection)
         .delete(auth, todoList.delete_a_collection);
 

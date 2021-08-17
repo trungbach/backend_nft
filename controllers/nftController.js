@@ -70,6 +70,7 @@ exports.list_item_created = async function (req, res) {
         let price = ethers.utils.formatUnits(i.price.toString(), 'ether')
         let item = {
             price,
+            itemId: i.itemId.toNumber(),
             tokenId: i.tokenId.toNumber(),
             seller: i.seller,
             owner: i.owner,
@@ -83,7 +84,7 @@ exports.list_item_created = async function (req, res) {
 
 exports.list_item_bought = async function (req, res) {
     const { address } = req.body
-    const provider = new ethers.getDefaultProvider("https://rpc-mumbai.maticvigil.com/")
+    const provider = new ethers.getDefaultProvider(`https://ropsten.infura.io/v3/${process.env.INFURA_ID}`)
     const signer = provider.getSigner(address) 
     const marketContract = new ethers.Contract(config.nftmarketaddress, Market.abi, signer)
     const tokenContract = new ethers.Contract(config.nftaddress, NFT.abi, provider)
@@ -95,6 +96,7 @@ exports.list_item_bought = async function (req, res) {
       let price = ethers.utils.formatUnits(i.price.toString(), 'ether')
       let item = {
         price,
+        itemId: i.itemId.toNumber(),
         tokenId: i.tokenId.toNumber(),
         seller: i.seller,
         owner: i.owner,

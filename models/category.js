@@ -6,8 +6,8 @@ var Category = function(category){
     console.log(category);
     this.name = category.name;
     this.slug = slug(category.name);
-    this.logo_url = category.logo_url;
-    this.image_url = category.image_url;
+    this.logo_id = category.logo_id;
+    this.cover_id = category.cover_id;
 };
 Category.createCategory = function createUser(newCategory, result) {
     sql.query("INSERT INTO categories set ?", newCategory, function (err, res) {
@@ -23,7 +23,7 @@ Category.createCategory = function createUser(newCategory, result) {
     });
 };
 Category.getCategoryById = function createUser(categoryId, result) {
-    sql.query("Select * from categories where id = ? LIMIT 1", categoryId, function (err, res) {
+    sql.query(`Select categories.*, cover.original_url as cover_url, logo.original_url as logo_url, cover.thumb_url as cover_thumb_url, logo.thumb_url as logo_thumb_url from categories left join files as cover on cover.id = categories.cover_id left join files as logo on logo.id = categories.logo_id  where categories.id = ?`, categoryId, function (err, res) {
         if(err) {
             console.log("error: ", err);
             result(err, null);
@@ -35,8 +35,7 @@ Category.getCategoryById = function createUser(categoryId, result) {
     });
 };
 Category.getAllCategory = function getAllCategory(result) {
-    sql.query("Select * from categories", function (err, res) {
-
+    sql.query(`Select categories.*, cover.original_url as cover_url, logo.original_url as logo_url, cover.thumb_url as cover_thumb_url, logo.thumb_url as logo_thumb_url from categories left join files as cover on cover.id = categories.cover_id left join files as logo on logo.id = categories.logo_id`, function (err, res) {
         if(err) {
             console.log("error: ", err);
             result(null, err);

@@ -1,5 +1,7 @@
 'use strict';
 var fs = require('fs');
+const sharp = require('sharp');
+var File = require('../models/files');
 
 module.exports = function (app) {
 
@@ -15,21 +17,27 @@ module.exports = function (app) {
                 console.log(timestamp)
                 //Use the name of the input field (i.e. "file") to retrieve the uploaded file
                 let file = req.files.file;
+                let original_name = `${timestamp}${file.name}`
                 //Use the mv() method to place the file in upload directory (i.e. "uploads")
                 file.mv('./public/uploads/' + file.name);
-                fs.rename(`./public/uploads/${file.name}`, `./public/uploads/${timestamp}${file.name}`, function(err) {
+                fs.rename(`./public/uploads/${file.name}`, `./public/uploads/${original_name}`, function(err) {
                     if ( err ) console.log('ERROR: ' + err);
                 });
-                //send response
+
+                let thumb_name = `${timestamp}_thumb_${file.name}`
+                await sharp(file.data).resize(200, 200).toFile(`./public/uploads/${thumb_name}`);
+                
+                //save file
+                var file_id = await File.createFile(new File({
+                    original_url: `${req.protocol}://${req.get('host')}/public/uploads/${original_name}`,
+                    thumb_url: `${req.protocol}://${req.get('host')}/public/uploads/${thumb_name}`
+                }))
+                var newFile = await File.getItemById(file_id);
+                
+                // send response
                 res.send({
-                    status: true,
                     message: 'File is uploaded',
-                    data: {
-                        name: `${timestamp}${file.name}`,
-                        mimetype: file.mimetype,
-                        size: file.size,
-                        path: `${req.protocol}://${req.get('host')}/public/uploads/${timestamp}${file.name}`
-                    }
+                    data: newFile
                 });
             }
         } catch (err) {
