@@ -28,6 +28,8 @@ var Item = function (item) {
     this.sell = SELL;
     this.category_id = item.category_id
 };
+Item.SELL = SELL
+Item.ASSET = ASSET
 Item.createItem = function createItem(item, result) {
     sql.query("INSERT INTO items set ?", item, function (err, res) {
         if (err) {
@@ -200,7 +202,7 @@ Item.assetItems = function (public_address) {
         from items 
         left join files as image
         on image.id = items.image_id
-        where items.created != ${public_address} and items.owner = ${public_address}`, function (err, res) {
+        where items.created != ${public_address} and items.owner = ${public_address} and items.sell = ${ASSET}`, function (err, res) {
             return err ? resolve(null) : resolve(res);
         });
     });

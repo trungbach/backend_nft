@@ -3,9 +3,6 @@ var slug = require('slug')
 var Item = require('../models/item');
 var User = require('../models/user');
 
-const SELL = 1
-const ASSET = 0
-
 exports.list_all_item = function (req, res) {
     Item.getAllItem(req.query, function (err, task) {
         if (err)
@@ -39,7 +36,7 @@ exports.create_a_item = async function (req, res) {
         collection_id,
         category_id,
         block_id,
-        sell: SELL,
+        sell: Item.SELL,
     }
     Item.createItem(new_item, function (err, task) {
         if (err)
@@ -64,7 +61,7 @@ exports.buy_item = async function (req, res) {
     const { user_id, params } = req
     var user = await User.findById(user_id);
     var item = await Item.getItemById(item_id);
-    if(item.sell == SELL){
+    if(item.sell == Item.SELL){
         Item.buyItemById(params.itemId, user.public_address, function (err, task) {
             if (err)
                 res.status(400)
@@ -80,7 +77,7 @@ exports.resell_item = async function (req, res) {
     const { user_id, params } = req
     var user = await User.findById(user_id);
     var item = await Item.getItemById(item_id);
-    if(item.sell == ASSET && item.owner == user.public_address){
+    if(item.sell == Item.ASSET && item.owner == user.public_address){
         Item.resellItemById(params.itemId, function (err, task) {
             if (err)
                 res.status(400)
