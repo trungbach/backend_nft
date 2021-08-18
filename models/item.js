@@ -136,8 +136,8 @@ Item.buyItemById = function (id, public_address, result) {
         }
     });
 };
-Item.resellItemById = function (id, result) {
-    sql.query(`UPDATE items SET sell = ${SELL} WHERE id = ?`, [id], function (err, res) {
+Item.resellItemById = function (id,price, result) {
+    sql.query(`UPDATE items SET sell = ${SELL}, price = ? WHERE id = ?`, [price, id], function (err, res) {
         if (err) {
             console.log("error: ", err);
             result(null, err);

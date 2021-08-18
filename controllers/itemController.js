@@ -74,11 +74,11 @@ exports.buy_item = async function (req, res) {
 };
 
 exports.resell_item = async function (req, res) {
-    const { user_id, params } = req
+    const { user_id, params, body } = req
     var user = await User.findById(user_id);
     var item = await Item.getItemById(params.itemId);
     if(item.sell == Item.ASSET && item.owner == user.public_address){
-        Item.resellItemById(params.itemId, function (err, task) {
+        Item.resellItemById(params.itemId,body.price, function (err, task) {
             if (err)
                 res.status(400)
                     .send({ message: "Error", data: err });
