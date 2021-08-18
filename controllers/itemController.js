@@ -13,7 +13,8 @@ exports.list_all_item = function (req, res) {
 };
 
 exports.list_favorite_item = function (req, res) {
-    Item.getFavoriteItem(req.user_id, function (err, task) {
+    const { user_id } = req.query
+    Item.getFavoriteItem(user_id, function (err, task) {
         if (err)
             res.status(400)
                 .send({ message: "Error", data: err });
@@ -91,14 +92,14 @@ exports.resell_item = async function (req, res) {
 
 
 exports.my_items = async function (req, res) {
-    const { user_id } = req
+    const { user_id } = req.query
     var user = await User.findById(user_id);
     var task = await Item.createdItems(user.public_address);
     res.send({ message: "Success", data: task })
 };
 
 exports.my_assets = async function (req, res) {
-    const { user_id } = req
+    const { user_id } = req.query
     var user = await User.findById(user_id);
     console.log(user.public_address)
     var task = await Item.assetItems(user.public_address);

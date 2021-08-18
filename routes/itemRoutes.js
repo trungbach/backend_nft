@@ -15,13 +15,13 @@ module.exports = function (app) {
         .put(auth, todoList.buy_item);
 
     app.route('/favorite-items')
-        .get(auth, todoList.list_favorite_item);
+        .get(todoList.list_favorite_item);
 
     app.route('/my-created-items')
-        .get(auth, todoList.my_items);
+        .get(todoList.my_items);
 
     app.route('/my-assets-items')
-        .get(auth, todoList.my_assets);
+        .get(todoList.my_assets);
 
     app.route('/most-favorite-item')
         .get(todoList.most_favorite_item);
