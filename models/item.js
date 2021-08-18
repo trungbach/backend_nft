@@ -202,7 +202,7 @@ Item.assetItems = function (public_address) {
         from items 
         left join files as image
         on image.id = items.image_id
-        where items.created != ${public_address} and items.owner = ${public_address} and items.sell = ${ASSET}`, function (err, res) {
+        where items.created != '${public_address}' and items.owner = '${public_address}' and items.sell = ${ASSET}`, function (err, res) {
             return err ? resolve(null) : resolve(res);
         });
     });

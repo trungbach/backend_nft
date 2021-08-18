@@ -100,7 +100,7 @@ exports.my_items = async function (req, res) {
 exports.my_assets = async function (req, res) {
     const { user_id } = req
     var user = await User.findById(user_id);
-    console.log(user)
+    console.log(user.public_address)
     var task = await Item.assetItems(user.public_address);
     res.send({ message: "Success", data: task })
 };
