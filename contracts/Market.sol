@@ -53,7 +53,7 @@ contract NFTMarket is ReentrancyGuard {
     uint256 price
   ) public payable nonReentrant {
     require(price > 0, "Price must be at least 1 wei");
-    require(msg.value == listingPrice, "Price must be equal to listing price");
+    // require(msg.value == listingPrice, "Price must be equal to listing price");
 
     _itemIds.increment();
     uint256 itemId = _itemIds.current();
@@ -89,9 +89,6 @@ contract NFTMarket is ReentrancyGuard {
     ) public payable nonReentrant {
     uint price = idToMarketItem[itemId].price;
     uint tokenId = idToMarketItem[itemId].tokenId;
-    console.log("soliti");
-    console.log(msg.value);
-    console.log(price);
 
     require(msg.value >= price, "Please submit the asking price in order to complete the purchase");
     
@@ -100,7 +97,7 @@ contract NFTMarket is ReentrancyGuard {
     idToMarketItem[itemId].owner = payable(msg.sender);
     idToMarketItem[itemId].sold = true;
     _itemsSold.increment();
-    payable(owner).transfer(listingPrice);
+    // payable(owner).transfer(listingPrice);
   }
 
   /* Returns all unsold market items */
@@ -172,5 +169,25 @@ contract NFTMarket is ReentrancyGuard {
   function fetchDetailItem(uint256 itemId) public view returns (MarketItem memory) {
     MarketItem storage currentItem = idToMarketItem[itemId];
     return currentItem;
+  }
+
+  function reCreateMarketItem(
+    address nftContract,
+    uint256 itemId,
+    uint256 price
+  ) public payable nonReentrant {
+    require(price > 0, "Price must be at least 1 wei");
+
+    uint tokenId = idToMarketItem[itemId].tokenId;
+    console.log(msg.sender);
+    require(msg.sender == IERC721(nftContract).ownerOf(tokenId), "NOT OWNER");
+
+    IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
+
+    idToMarketItem[itemId].seller = payable(msg.sender);
+    idToMarketItem[itemId].owner = payable(address(0));
+    idToMarketItem[itemId].sold = false;
+    idToMarketItem[itemId].price = price;
+    _itemsSold.decrement();
   }
 }
