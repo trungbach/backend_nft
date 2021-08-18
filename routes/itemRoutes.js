@@ -12,7 +12,7 @@ module.exports = function (app) {
         .get(auth, todoList.read_a_item);
 
     app.route('/buy-item/:itemId')
-        .put(auth, todoList.update_a_item);
+        .put(auth, todoList.buy_item);
 
     app.route('/favorite-items')
         .get(auth, todoList.list_favorite_item);
@@ -25,4 +25,7 @@ module.exports = function (app) {
 
     app.route('/most-favorite-item')
         .get(todoList.most_favorite_item);
+
+    app.route('/resell-item/:itemId')
+        .put(auth, todoList.resell_item);
 };
