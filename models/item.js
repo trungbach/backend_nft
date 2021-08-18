@@ -58,7 +58,7 @@ Item.getItemById = function getItemById(itemId) {
 
 Item.getDetailItem = function getDetailItem(itemId, user_id) {
     return new Promise((resolve, reject) => {
-        sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url, users.username as user_name, users.id as user_id, collections.name as collection_name, image_collection.thumb_url as collection_logo, collections.description as collection_description,
+        sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url, users.username as user_name, users.id as user_id, image_user.thumb_url as avatar_url, collections.name as collection_name, image_collection.thumb_url as collection_logo, collections.description as collection_description,
          (select favorites.id from favorites where favorites.user_id = ${user_id} AND favorites.item_id = ${itemId} ) as is_favorite 
         from items 
         left join collections
@@ -69,6 +69,8 @@ Item.getDetailItem = function getDetailItem(itemId, user_id) {
         on image.id = items.image_id
         left join files as image_collection
         on image_collection.id = collections.logo_id
+        left join files as image_user
+        on image_user.id = users.avatar_id
         where items.id = ${itemId} LIMIT 1`,
             function (err, res) {
                 console.log(err)
