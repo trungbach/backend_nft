@@ -28,7 +28,16 @@ Collection.createCollection = function createCollection(collection, result) {
 };
 Collection.getCollectionById = function getCollectionById(id) {
     return new Promise((resolve, reject) => {
-        sql.query("Select collections.*, cover.original_url as cover_url, logo.original_url as logo_url, cover.thumb_url as cover_thumb_url, logo.thumb_url as logo_thumb_url from collections left join files as cover on cover.id = collections.cover_id left join files as logo on logo.id = collections.logo_id  where collections.id = ? ", id, function (err, res) {
+        sql.query(`Select collections.*, cover.original_url as cover_url, logo.original_url as logo_url, cover.thumb_url as cover_thumb_url, logo.thumb_url as logo_thumb_url,
+        (Select count(items.id) from items where items.created != items.owner and items.collection_id = ${id}) as total_bought_item,
+        (Select count(items.id) from items where items.collection_id = ${id}) as total_item,
+        (Select items.price from items where items.collection_id = ${id} ORDER BY items.price ASC LIMIT 1) as min_item 
+        from collections 
+        left join files as cover 
+        on cover.id = collections.cover_id 
+        left join files as logo 
+        on logo.id = collections.logo_id  
+        where collections.id = ?`, id, function (err, res) {
             return err ? resolve(null) : resolve(res.length > 0 ? res[0] : null);
         });
     });
