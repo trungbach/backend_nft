@@ -31,7 +31,8 @@ Collection.getCollectionById = function getCollectionById(id) {
         sql.query(`Select collections.*, cover.original_url as cover_url, logo.original_url as logo_url, cover.thumb_url as cover_thumb_url, logo.thumb_url as logo_thumb_url,
         (Select count(items.id) from items where items.created != items.owner and items.collection_id = ${id}) as total_bought_item,
         (Select count(items.id) from items where items.collection_id = ${id}) as total_item,
-        (Select items.price from items where items.collection_id = ${id} ORDER BY items.price ASC LIMIT 1) as min_item 
+        (Select items.price from items where items.collection_id = ${id} ORDER BY items.price asc LIMIT 1) as min_price,
+        (Select items.price from items where items.collection_id = ${id} ORDER BY items.price desc LIMIT 1) as max_price 
         from collections 
         left join files as cover 
         on cover.id = collections.cover_id 
