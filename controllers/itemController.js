@@ -60,7 +60,7 @@ exports.read_a_item = async function (req, res) {
 exports.buy_item = async function (req, res) {
     const { user_id, params } = req
     var user = await User.findById(user_id);
-    var item = await Item.getItemById(item_id);
+    var item = await Item.getItemById(params.itemId);
     if(item.sell == Item.SELL){
         Item.buyItemById(params.itemId, user.public_address, function (err, task) {
             if (err)
@@ -76,7 +76,7 @@ exports.buy_item = async function (req, res) {
 exports.resell_item = async function (req, res) {
     const { user_id, params } = req
     var user = await User.findById(user_id);
-    var item = await Item.getItemById(item_id);
+    var item = await Item.getItemById(params.itemId);
     if(item.sell == Item.ASSET && item.owner == user.public_address){
         Item.resellItemById(params.itemId, function (err, task) {
             if (err)
