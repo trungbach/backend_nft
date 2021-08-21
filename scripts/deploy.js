@@ -2,8 +2,13 @@ const hre = require("hardhat");
 const fs = require('fs');
 
 async function main() {
+  const HSNToken = await hre.ethers.getContractFactory("HSNToken");
+  const hsn = await HSNToken.deploy();
+  await hsn.deployed();
+  console.log("hsn deployed to:", hsn.address);
+
   const NFTMarket = await hre.ethers.getContractFactory("NFTMarket");
-  const nftMarket = await NFTMarket.deploy();
+  const nftMarket = await NFTMarket.deploy(hsn.address);
   await nftMarket.deployed();
   console.log("nftMarket deployed to:", nftMarket.address);
 
@@ -13,8 +18,9 @@ async function main() {
   console.log("nft deployed to:", nft.address);
 
   let config = `
-  export const nftmarketaddress = "${nftMarket.address}"
-  export const nftaddress = "${nft.address}"
+  exports.nftmarketaddress = "${nftMarket.address}"
+  exports.nftaddress = "${nft.address}"
+  exports.hsnaddress = "${hsn.address}"
   `
 
   let data = JSON.stringify(config)

@@ -30,7 +30,7 @@ exports.create_a_item = async function (req, res) {
         name,
         image_id,
         price,
-        symbol,
+        symbol: symbol ? symbol : Item.ETH,
         slug: slug(name),
         owner: user.public_address,
         created: user.public_address,

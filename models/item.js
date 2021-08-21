@@ -13,6 +13,9 @@ const FAVORITE_SORT = 4
 const OLDEST_SORT = 5
 // const SOLD_SORT = 6
 
+//symbol
+const ETH = "ETH"
+const MY_TOKEN = "HSN"
 //Item object constructor
 var Item = function (item) {
     this.name = item.name;
@@ -27,9 +30,13 @@ var Item = function (item) {
     this.block_id = item.block_id;
     this.sell = SELL;
     this.category_id = item.category_id
+    this.symbol = ETH
 };
 Item.SELL = SELL
 Item.ASSET = ASSET
+Item.ETH = ETH
+Item.MY_TOKEN = MY_TOKEN
+
 Item.createItem = function createItem(item, result) {
     sql.query("INSERT INTO items set ?", item, function (err, res) {
         if (err) {
