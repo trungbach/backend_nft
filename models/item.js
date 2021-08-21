@@ -240,7 +240,7 @@ Item.resell = function (public_address) {
         on image.id = items.image_id
         left join collections
         on items.collection_id = collections.id
-        where items.created != '${public_address}' and items.owner = '${public_address}'`, function (err, res) {
+        where items.created != '${public_address}' and items.owner = '${public_address}' and items.sell = ${SELL}`, function (err, res) {
             return err ? resolve(null) : resolve(res);
         });
     });
