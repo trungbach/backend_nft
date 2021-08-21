@@ -110,7 +110,7 @@ Item.getAllItem = function getAllItem(params, result) {
     if (category_id) {
         str += ` AND items.category_id = ${category_id}`
     }
-    if (category_id) {
+    if (symbol) {
         str += ` AND items.symbol = ${symbol}`
     }
 
