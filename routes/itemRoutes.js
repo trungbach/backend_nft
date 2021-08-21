@@ -28,4 +28,7 @@ module.exports = function (app) {
 
     app.route('/resell-item/:itemId')
         .put(auth, todoList.resell_item);
+    
+    app.route('/my-resell-items')
+        .get(todoList.resell);
 };

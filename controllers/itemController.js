@@ -106,6 +106,14 @@ exports.my_assets = async function (req, res) {
     res.send({ message: "Success", data: task })
 };
 
+exports.resell = async function (req, res) {
+    const { user_id } = req.query
+    var user = await User.findById(user_id);
+    console.log(user.public_address)
+    var task = await Item.resell(user.public_address);
+    res.send({ message: "Success", data: task })
+};
+
 
 exports.delete_a_item = function (req, res) {
     Item.remove(req.params.taskId, function (err, task) {

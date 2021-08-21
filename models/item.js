@@ -58,19 +58,26 @@ Item.getItemById = function getItemById(itemId) {
 
 Item.getDetailItem = function getDetailItem(itemId, user_id) {
     return new Promise((resolve, reject) => {
-        sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url, users.username as user_name, users.id as user_id, image_user.thumb_url as avatar_url, collections.name as collection_name, image_collection.thumb_url as collection_logo, collections.description as collection_description,
-         (select favorites.id from favorites where favorites.user_id = ${user_id} AND favorites.item_id = ${itemId} ) as is_favorite 
+        sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url, 
+        created_user.username as created_user_name, created_user.id as created_user_id, image_user.thumb_url as created_avatar_url, 
+        sell_user.username as sell_user_name, sell_user.id as sell_user_id, image_sell_user.thumb_url as sell_avatar_url, 
+        collections.name as collection_name, image_collection.thumb_url as collection_logo, collections.description as collection_description,
+        (select favorites.id from favorites where favorites.user_id = ${user_id} AND favorites.item_id = ${itemId} ) as is_favorite 
         from items 
         left join collections
         on items.collection_id = collections.id
-        left join users
-        on users.public_address = items.created
+        left join users as created_user
+        on created_user.public_address = items.created
+        left join users as sell_user
+        on sell_user.public_address = items.owner
         left join files as image
         on image.id = items.image_id
         left join files as image_collection
         on image_collection.id = collections.logo_id
         left join files as image_user
-        on image_user.id = users.avatar_id
+        on image_user.id = created_user.avatar_id
+        left join files as image_sell_user
+        on image_sell_user.id = sell_user.avatar_id
         where items.id = ${itemId} LIMIT 1`,
             function (err, res) {
                 console.log(err)
@@ -170,12 +177,14 @@ Item.remove = function (id, result) {
     });
 };
 Item.getFavoriteItem = function getFavoriteItem(user_id, result) {
-    sql.query(`SELECT DISTINCT items.*, image.original_url as image_url, image.thumb_url as image_thumb_url
+    sql.query(`SELECT DISTINCT items.*, image.original_url as image_url, image.thumb_url as image_thumb_url, collections.name as collection_name 
     FROM items
     LEFT JOIN favorites
     ON items.id = favorites.item_id
     LEFT JOIN files as image
     ON image.id = items.image_id
+    left join collections
+    on items.collection_id = collections.id
     WHERE favorites.user_id = ${user_id} AND items.sell = ${SELL}`, function (err, res) {
         if (err) {
             console.log("error: ", err);
@@ -189,10 +198,12 @@ Item.getFavoriteItem = function getFavoriteItem(user_id, result) {
 };
 Item.createdItems = function (public_address) {
     return new Promise((resolve, reject) => {
-        sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url 
+        sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url, collections.name as collection_name 
         from items 
         left join files as image
         on image.id = items.image_id
+        left join collections
+        on items.collection_id = collections.id
         where items.created = ? `, [public_address], function (err, res) {
             return err ? resolve(null) : resolve(res);
         });
@@ -200,11 +211,26 @@ Item.createdItems = function (public_address) {
 };
 Item.assetItems = function (public_address) {
     return new Promise((resolve, reject) => {
-        sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url 
+        sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url, collections.name as collection_name 
         from items 
         left join files as image
         on image.id = items.image_id
+        left join collections
+        on items.collection_id = collections.id
         where items.created != '${public_address}' and items.owner = '${public_address}' and items.sell = ${ASSET}`, function (err, res) {
+            return err ? resolve(null) : resolve(res);
+        });
+    });
+};
+Item.resell = function (public_address) {
+    return new Promise((resolve, reject) => {
+        sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url, collections.name as collection_name 
+        from items 
+        left join files as image
+        on image.id = items.image_id
+        left join collections
+        on items.collection_id = collections.id
+        where items.created != '${public_address}' and items.owner = '${public_address}'`, function (err, res) {
             return err ? resolve(null) : resolve(res);
         });
     });
