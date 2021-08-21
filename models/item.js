@@ -93,7 +93,7 @@ Item.getDetailItem = function getDetailItem(itemId, user_id) {
     });
 };
 Item.getAllItem = function getAllItem(params, result) {
-    const { key, min_price, max_price, collection_id, category_id, sort } = params
+    const { key, min_price, max_price, collection_id, category_id, sort, symbol } = params
     var str = ""
     if (key) {
         str += ` AND items.name LIKE '%${key}%'`
@@ -109,6 +109,9 @@ Item.getAllItem = function getAllItem(params, result) {
     }
     if (category_id) {
         str += ` AND items.category_id = ${category_id}`
+    }
+    if (category_id) {
+        str += ` AND items.symbol = ${symbol}`
     }
 
     var orderBy = ""
