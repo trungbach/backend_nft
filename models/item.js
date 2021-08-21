@@ -111,7 +111,7 @@ Item.getAllItem = function getAllItem(params, result) {
         str += ` AND items.category_id = ${category_id}`
     }
     if (symbol) {
-        str += ` AND items.symbol = ${symbol}`
+        str += ` AND items.symbol = '${symbol}'`
     }
 
     var orderBy = ""
