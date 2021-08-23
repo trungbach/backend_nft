@@ -2,6 +2,7 @@
 var slug = require('slug')
 var Item = require('../models/item');
 var User = require('../models/user');
+var Transaction = require('../models/transaction');
 
 exports.list_all_item = function (req, res) {
     Item.getAllItem(req.query, function (err, task) {
@@ -39,12 +40,22 @@ exports.create_a_item = async function (req, res) {
         block_id,
         sell: Item.SELL,
     }
-    Item.createItem(new_item, function (err, task) {
-        if (err)
-            res.status(400)
-                .send({ message: "Error", data: err });
-        res.send({ message: "Success", data: task })
-    });
+    let item = await Item.createItem(new_item);
+    if(item == null){
+        res.status(400)
+                .send({ message: "Error" });
+    }else{
+        let transaction = {
+            user_id,
+            item_id: item.insertId, 
+            type: Transaction.CREATE,
+            price,
+            symbol,
+            benefit: (price * 0.01),
+        }
+        await Transaction.createTransaction(transaction)
+        res.send({ message: "Success", data: item })
+    }
 };
 
 
@@ -63,12 +74,22 @@ exports.buy_item = async function (req, res) {
     var user = await User.findById(user_id);
     var item = await Item.getItemById(params.itemId);
     if(item.sell == Item.SELL){
-        Item.buyItemById(params.itemId, user.public_address, function (err, task) {
-            if (err)
-                res.status(400)
-                    .send({ message: "Error", data: err });
+        let task = await Item.buyItemById(params.itemId, user.public_address);
+        if(task == null){
+            res.status(400)
+                    .send({ message: "Error" });
+        }else{
+            let transaction = {
+                user_id,
+                item_id: params.itemId, 
+                type: Transaction.BUY,
+                price: item.price,
+                symbol: item.symbol,
+                benefit: 0,
+            }
+            await Transaction.createTransaction(transaction)
             res.json(task);
-        });
+        }
     }else{
         res.status(400).send({ message: "Error", data: err });
     }
@@ -79,12 +100,22 @@ exports.resell_item = async function (req, res) {
     var user = await User.findById(user_id);
     var item = await Item.getItemById(params.itemId);
     if(item.sell == Item.ASSET && item.owner == user.public_address){
-        Item.resellItemById(params.itemId,body.price, function (err, task) {
-            if (err)
-                res.status(400)
-                    .send({ message: "Error", data: err });
+        let task = await Item.resellItemById(params.itemId,body.price);
+        if(task == null){
+            res.status(400)
+                    .send({ message: "Error" });
+        }else{
+            let transaction = {
+                user_id,
+                item_id: params.itemId, 
+                type: Transaction.RESELL,
+                price: body.price,
+                symbol: item.symbol,
+                benefit: (body.price * 0.01),
+            }
+            await Transaction.createTransaction(transaction)
             res.json(task);
-        });
+        }
     }else{
         res.status(400).send({ message: "Error", data: err });
     }

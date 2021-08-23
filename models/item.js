@@ -30,22 +30,17 @@ var Item = function (item) {
     this.block_id = item.block_id;
     this.sell = SELL;
     this.category_id = item.category_id
-    this.symbol = ETH
 };
 Item.SELL = SELL
 Item.ASSET = ASSET
 Item.ETH = ETH
 Item.MY_TOKEN = MY_TOKEN
 
-Item.createItem = function createItem(item, result) {
-    sql.query("INSERT INTO items set ?", item, function (err, res) {
-        if (err) {
-            console.log("error: ", err);
-            result(err, null);
-        }
-        else {
-            result(null, res);
-        }
+Item.createItem = function createItem(item) {
+    return new Promise((resolve, reject) => {
+        sql.query("INSERT INTO items set ?", item, function (err, res) {
+            return err ? resolve(null) : resolve(res)
+        });
     });
 };
 Item.getItemById = function getItemById(itemId) {
@@ -144,26 +139,18 @@ Item.getAllItem = function getAllItem(params, result) {
         }
     });
 };
-Item.buyItemById = function (id, public_address, result) {
-    sql.query(`UPDATE items SET owner = ?, sell = ${ASSET} WHERE id = ?`, [public_address, id], function (err, res) {
-        if (err) {
-            console.log("error: ", err);
-            result(null, err);
-        }
-        else {
-            result(null, res);
-        }
+Item.buyItemById = function (id, public_address) {
+    return new Promise((resolve, reject) => {
+        sql.query(`UPDATE items SET owner = ?, sell = ${ASSET} WHERE id = ?`, [public_address, id], function (err, res) {
+            return err ? resolve(null) : resolve(res);
+        });
     });
 };
-Item.resellItemById = function (id,price, result) {
-    sql.query(`UPDATE items SET sell = ${SELL}, price = ? WHERE id = ?`, [price, id], function (err, res) {
-        if (err) {
-            console.log("error: ", err);
-            result(null, err);
-        }
-        else {
-            result(null, res);
-        }
+Item.resellItemById = function (id, price) {
+    return new Promise((resolve, reject) => {
+        sql.query(`UPDATE items SET sell = ${SELL}, price = ? WHERE id = ?`, [price, id], function (err, res) {
+            return err ? resolve(null) : resolve(res);
+        });
     });
 };
 Item.updateFavoriteById = function (id, number_favorites) {
