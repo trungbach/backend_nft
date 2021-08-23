@@ -93,7 +93,11 @@ Item.getAllItem = function getAllItem(params, result) {
     // limit as 20
     const limit = config.limit
     // calculate offset
-    const offset = page * limit
+    let defaultPage = 0
+    if(page){
+        defaultPage = page
+    }
+    const offset = defaultPage * limit
 
     var str = ""
     if (key) {
