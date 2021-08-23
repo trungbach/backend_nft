@@ -1,5 +1,6 @@
 'user strict';
 var sql = require('../config/db.js');
+var config = require('../config/config');
 var slug = require('slug')
 
 //item sell
@@ -88,7 +89,12 @@ Item.getDetailItem = function getDetailItem(itemId, user_id) {
     });
 };
 Item.getAllItem = function getAllItem(params, result) {
-    const { key, min_price, max_price, collection_id, category_id, sort, symbol } = params
+    const { key, min_price, max_price, collection_id, category_id, sort, symbol, page } = params
+    // limit as 20
+    const limit = config.limit
+    // calculate offset
+    const offset = page * limit
+
     var str = ""
     if (key) {
         str += ` AND items.name LIKE '%${key}%'`
@@ -111,15 +117,15 @@ Item.getAllItem = function getAllItem(params, result) {
 
     var orderBy = ""
     if (sort == CREATED_SORT) {
-        orderBy = "ORDER BY items.created_at asc"
+        orderBy = "ORDER BY items.created_at asc "
     } else if (sort == PRICE_INCREASE_SORT) {
-        orderBy = "ORDER BY items.price asc"
+        orderBy = "ORDER BY items.price asc "
     } else if (sort == PRICE_REDUCED_SORT) {
-        orderBy = "ORDER BY items.price desc"
+        orderBy = "ORDER BY items.price desc "
     } else if (sort == OLDEST_SORT) {
-        orderBy = "ORDER BY items.created_at desc"
+        orderBy = "ORDER BY items.created_at desc "
     } else if (sort == FAVORITE_SORT) {
-        orderBy = "ORDER BY items.number_favorites desc"
+        orderBy = "ORDER BY items.number_favorites desc "
     }
 
     sql.query(`Select items.*, collections.name as collection_name, image.original_url as image_url, image.thumb_url as image_thumb_url
@@ -129,7 +135,8 @@ Item.getAllItem = function getAllItem(params, result) {
     LEFT JOIN files as image
     ON image.id = items.image_id
     WHERE items.sell = ${SELL} ${str} 
-    ${orderBy}`, function (err, res) {
+    ${orderBy}
+    limit ${limit} OFFSET ${offset}`, function (err, res) {
         if (err) {
             console.log("error: ", err);
             result(null, err);
