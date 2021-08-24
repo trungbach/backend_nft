@@ -35,7 +35,7 @@ Category.getCategoryById = function createUser(categoryId, result) {
     });
 };
 Category.getAllCategory = function getAllCategory(result) {
-    sql.query(`Select categories.*, cover.original_url as cover_url, logo.original_url as logo_url, cover.thumb_url as cover_thumb_url, logo.thumb_url as logo_thumb_url from categories left join files as cover on cover.id = categories.cover_id left join files as logo on logo.id = categories.logo_id`, function (err, res) {
+    sql.query(`Select categories.*, cover.original_url as cover_url, logo.original_url as logo_url, cover.thumb_url as cover_thumb_url, logo.thumb_url as logo_thumb_url from categories left join files as cover on cover.id = categories.cover_id left join files as logo on logo.id = categories.logo_id where categories.deleted = 0`, function (err, res) {
         if(err) {
             console.log("error: ", err);
             result(null, err);
@@ -46,7 +46,7 @@ Category.getAllCategory = function getAllCategory(result) {
     });
 };
 Category.updateById = function(id, category, result){
-    sql.query("UPDATE categories SET name = ? WHERE id = ?", [category.name, id], function (err, res) {
+    sql.query("UPDATE categories SET name = ?, slug = ?, logo_id = ?, cover_id = ? WHERE id = ?", [category.name, slug(category.name), category.logo_id, category.cover_id, id], function (err, res) {
         if(err) {
             console.log("error: ", err);
             result(null, err);
@@ -57,8 +57,9 @@ Category.updateById = function(id, category, result){
     });
 };
 Category.remove = function(id, result){
-    sql.query("DELETE FROM categories WHERE id = ?", [id], function (err, res) {
-
+    console.log(id)
+    sql.query(`UPDATE categories SET deleted = 1 WHERE id = ?`, [id], function (err, res) {
+        console.log("error: ", err);
         if(err) {
             console.log("error: ", err);
             result(null, err);

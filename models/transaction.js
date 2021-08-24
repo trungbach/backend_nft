@@ -26,7 +26,13 @@ Transaction.createTransaction = function createTransaction(newTransaction, resul
 };
 Transaction.getTransactionById = function getTransactionById(transactionId, result) {
     return new Promise((resolve, reject) => {
-        sql.query(`Select transactions.* from transactions where transactions.id = ?`, transactionId, function (err, res) {
+        sql.query(`Select transactions.* , user.username as user_name, item.name as item_name
+        from transactions 
+        LEFT JOIN users as user
+        ON user.id = transactions.user_id
+        LEFT JOIN items as item
+        ON item.id = transactions.item_id
+        where transactions.id = ?`, transactionId, function (err, res) {
             return err ? resolve(null) : resolve(res[0]);
         });
     });
@@ -45,8 +51,12 @@ Transaction.getAllTransaction = function getAllTransaction(params) {
     }
 
     return new Promise((resolve, reject) => {
-    sql.query(`SELECT transactions.* 
-        FROM transactions 
+    sql.query(`SELECT transactions.*, user.username as user_name, item.name as item_name
+        FROM transactions
+        LEFT JOIN users as user
+        ON user.id = transactions.user_id
+        LEFT JOIN items as item
+        ON item.id = transactions.item_id
         WHERE transactions.created_at >= '${start_time}' AND transactions.created_at <= '${end_time}' ${str}
         ORDER BY transactions.created_at desc`, function (err, res) {
             return err ? resolve(null) : resolve(res);

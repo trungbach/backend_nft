@@ -1,5 +1,6 @@
 'use strict';
 const jwt = require('jsonwebtoken');
+const bcrypt = require ('bcrypt');
 const User = require('../models/user');
 const ethereumjs = require('ethereumjs-util');
 const ethSig = require('eth-sig-util');
@@ -7,13 +8,19 @@ const buffer = require('buffer');
 const Buffer = buffer.Buffer;
 const recoverPersonalSignature = ethSig.recoverPersonalSignature
 
-exports.list_all_user = function (req, res) {
-    User.getAllUser(function (err, task) {
-        if (err)
-            res.status(400)
-                .send({ message: "Error", data: err });
-        res.send({ message: "Success", data: task })
-    });
+exports.list_all_user = async function (req, res) {
+    const { user_id, query } = req
+    var user = await User.findById(user_id);
+    if (user.role == User.ADMIN) {
+        User.getAllUser(query, function (err, task) {
+            if (err)
+                res.status(400)
+                    .send({ message: "Error", data: err });
+            res.send({ message: "Success", data: task })
+        });
+    } else {
+        res.status(400).send({ message: "You isn't a admin" });
+    }
 };
 
 exports.create_a_user = async function (request, res) {
@@ -82,7 +89,7 @@ exports.signature_verification = async function (request, res) {
 };
 
 exports.update_profile = async function (request, res) {
-    const { username, avatar_id, cover_id,description, email } = request.body;
+    const { username, avatar_id, cover_id, description, email } = request.body;
     var user = await User.updateProfile(request.user_id, username, avatar_id, cover_id, description, email);
     res.send({ message: "Success", data: user })
 };
@@ -90,4 +97,24 @@ exports.update_profile = async function (request, res) {
 exports.get_profile = async function (request, res) {
     var user = await User.getProfileById(request.params.userId);
     res.send({ message: "Success", data: user })
+};
+
+exports.admin_login = async function (req, res) {
+    try {
+        const { email, password } = req.body;
+
+        if (!(email && password)) {
+            res.status(400).send({ message: "All input is required" });
+        }
+        const user = await User.findByEmail(email);
+
+        if (user && (await bcrypt.compare(password, user.password))) {
+            var token = jwt.sign({ user_id: user.id }, process.env.JWT_SECRET, { expiresIn: process.env.TIME_TOKEN });
+            user.token = token;
+            res.send({ message: "Success", data: user })
+        }
+        res.status(400).send({ message: "Invalid Credentials" });
+    } catch (err) {
+        console.log(err);
+    }
 };
