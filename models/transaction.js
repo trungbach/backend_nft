@@ -63,5 +63,43 @@ Transaction.getAllTransaction = function getAllTransaction(params) {
         });
     });
 };
+Transaction.getAmountInWeekOfYear = function (mindate) {
+    return new Promise((resolve, reject) => {
+        sql.query(`select sum(t.benefit) as total_eth, t.symbol, 
+        WEEK(t.created_at) as week
+        from transactions as t 
+        where t.created_at>='${mindate}'
+        group by WEEK(t.created_at), t.symbol`, function (err, res) {
+            return err ? reject(err) : resolve(res);
+        }
+        );
+    });
+};
+
+Transaction.getAmountInDayOfMonth = function (mindate) {
+    return new Promise((resolve, reject) => {
+        sql.query(`select sum(t.benefit) as total_eth, t.symbol, 
+                DAY(t.created_at) as day
+                from transactions as t 
+                where t.created_at>='${mindate}'
+                group by DAY(t.created_at), t.symbol`, function (err, res) {
+            return err ? reject(err) : resolve(res);
+        }
+        );
+    });
+};
+
+Transaction.getAmountInMonthsOfYear = function (mindate) {
+    return new Promise((resolve, reject) => {
+        sql.query(`select sum(t.benefit) as total_eth, t.symbol, 
+        MONTH(t.created_at) as month
+        from transactions as t 
+        where t.created_at>='${mindate}'
+        group by MONTH(t.created_at), t.symbol`, function (err, res) {
+            return err ? reject(err) : resolve(res);
+        }
+        );
+    });
+};
 
 module.exports = Transaction;

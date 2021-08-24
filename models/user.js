@@ -67,7 +67,7 @@ User.updateProfile = function (id, username, avatar_id, cover_id, description, e
     });
 };
 
-User.getProfileById = function findById(id) {
+User.getProfileById = function (id) {
     return new Promise((resolve, reject) => {
         sql.query("Select users.*, cover.original_url as cover_url, avatar.original_url as avatar_url, cover.thumb_url as cover_thumb_url, avatar.thumb_url as avatar_thumb_url from users left join files as cover on cover.id = users.cover_id left join files as avatar on avatar.id = users.avatar_id  where users.id = ? ", id, function (err, res) {
             return err ? reject(err) : resolve(res[0]);
@@ -76,38 +76,39 @@ User.getProfileById = function findById(id) {
     });
 };
 
-User.getUserInMonth = function findById(sixmonths) {
+User.getUserInWeekOfYear = function (mindate) {
     return new Promise((resolve, reject) => {
-        sql.query(`select count(u.id) as total,
-        (SELECT COUNT(u.id)
-         FROM users u2
-         WHERE WEEK(u2.join_date) <=
-               WEEK(u.join_date)
-         AND u2.id = u.id) AS Total_count
-        from users u
-        where u.join_date>='${sixmonths}'
-        group by WEEK(u.join_date)
-        order by WEEK(u.join_date) desc
-        limit 26`, function (err, res) {
+        sql.query(`select count(u.id) as total, WEEK(u.created_at) as week
+        from users as u
+        where u.created_at>='${mindate}'
+        group by WEEK(u.created_at)
+        order by WEEK(u.created_at) asc`, function (err, res) {
             return err ? reject(err) : resolve(res);
         }
         );
     });
 };
 
-User.getUserInYear = function findById(sixmonths) {
+User.getUserInDayOfMonth = function (mindate) {
     return new Promise((resolve, reject) => {
-        sql.query(`select count(u.id) as total,
-        (SELECT COUNT(u.id)
-         FROM users u2
-         WHERE YEARWEEK(u2.join_date) <=
-               YEARWEEK(u.join_date)
-         AND u2.id = u.id) AS Total_count
-        from users u
-        where u.join_date>='${sixmonths}'
-        group by YEARWEEK(u.join_date)
-        order by YEARWEEK(u.join_date) desc
-        limit 26`, function (err, res) {
+        sql.query(`select count(u.id) as total, DAY(u.created_at) as day
+        from users as u
+        where u.created_at>='${mindate}'
+        group by DAY(u.created_at)
+        order by DAY(u.created_at) asc`, function (err, res) {
+            return err ? reject(err) : resolve(res);
+        }
+        );
+    });
+};
+
+User.getUserInMonthsOfYear = function (mindate) {
+    return new Promise((resolve, reject) => {
+        sql.query(`select count(u.id) as total, MONTH(u.created_at) as month
+        from users as u
+        where u.created_at>='${mindate}'
+        group by MONTH(u.created_at)
+        order by MONTH(u.created_at) asc`, function (err, res) {
             return err ? reject(err) : resolve(res);
         }
         );

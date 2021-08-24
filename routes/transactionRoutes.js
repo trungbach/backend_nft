@@ -8,4 +8,8 @@ module.exports = function (app) {
 
     app.route('/transactions/:transactionId')
         .get(auth,todoList.get_transaction_by_id);
+
+    app.route('/admin/transactions-weeks-of-year').get(auth,todoList.summary_weeks_of_year);
+    app.route('/admin/transactions-days-of-month').get(auth,todoList.summary_days_of_month);
+    app.route('/admin/transactions-months-of-year').get(auth,todoList.summary_months_of_year);
 };

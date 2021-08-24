@@ -1,6 +1,6 @@
 'use strict';
 const jwt = require('jsonwebtoken');
-const bcrypt = require ('bcrypt');
+const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const ethereumjs = require('ethereumjs-util');
 const ethSig = require('eth-sig-util');
@@ -116,5 +116,38 @@ exports.admin_login = async function (req, res) {
         res.status(400).send({ message: "Invalid Credentials" });
     } catch (err) {
         console.log(err);
+    }
+};
+
+exports.summary_weeks_of_year = async function (req, res) {
+    const { user_id } = req
+    var user = await User.findById(user_id);
+    if (user.role == User.ADMIN) {
+        const summary = await User.getUserInWeekOfYear(req.query.start_time);
+        res.send({ message: "Success", data: summary })
+    } else {
+        res.status(400).send({ message: "You isn't a admin" });
+    }
+};
+
+exports.summary_days_of_month = async function (req, res) {
+    const { user_id } = req
+    var user = await User.findById(user_id);
+    if (user.role == User.ADMIN) {
+        const summary = await User.getUserInDayOfMonth(req.query.start_time);
+        res.send({ message: "Success", data: summary })
+    } else {
+        res.status(400).send({ message: "You isn't a admin" });
+    }
+};
+
+exports.summary_months_of_year = async function (req, res) {
+    const { user_id } = req
+    var user = await User.findById(user_id);
+    if (user.role == User.ADMIN) {
+        const summary = await User.getUserInMonthsOfYear(req.query.start_time);
+        res.send({ message: "Success", data: summary })
+    } else {
+        res.status(400).send({ message: "You isn't a admin" });
     }
 };

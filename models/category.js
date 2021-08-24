@@ -57,9 +57,7 @@ Category.updateById = function(id, category, result){
     });
 };
 Category.remove = function(id, result){
-    console.log(id)
     sql.query(`UPDATE categories SET deleted = 1 WHERE id = ?`, [id], function (err, res) {
-        console.log("error: ", err);
         if(err) {
             console.log("error: ", err);
             result(null, err);

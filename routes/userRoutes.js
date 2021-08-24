@@ -15,4 +15,7 @@ module.exports = function (app) {
     app.route('/signature_verification_address').post(todoList.signature_verification);
 
     app.route('/admin/login').post(todoList.admin_login);
+    app.route('/admin/user-weeks-of-year').get(auth,todoList.summary_weeks_of_year);
+    app.route('/admin/user-days-of-month').get(auth,todoList.summary_days_of_month);
+    app.route('/admin/user-months-of-year').get(auth,todoList.summary_months_of_year);
 };
