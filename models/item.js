@@ -3,6 +3,8 @@ var sql = require('../config/db.js');
 var config = require('../config/config');
 var slug = require('slug')
 
+const limit = config.limit
+
 //item sell
 const SELL = 1
 const ASSET = 0
@@ -31,7 +33,7 @@ var Item = function (item) {
     this.block_id = item.block_id;
     this.sell = SELL;
     this.category_id = item.category_id
-    this.type= item.type ? item.type : File.IMAGE
+    this.type = item.type ? item.type : File.IMAGE
 };
 Item.SELL = SELL
 Item.ASSET = ASSET
@@ -91,11 +93,9 @@ Item.getDetailItem = function getDetailItem(itemId, user_id) {
 };
 Item.getAllItem = function getAllItem(params, result) {
     const { key, min_price, max_price, collection_id, category_id, sort, symbol, page, type } = params
-    // limit as 20
-    const limit = config.limit
-    // calculate offset
+
     let defaultPage = 0
-    if(page){
+    if (page) {
         defaultPage = page
     }
     const offset = defaultPage * limit
@@ -154,6 +154,43 @@ Item.getAllItem = function getAllItem(params, result) {
         }
     });
 };
+
+Item.countAllItem = function countAllItem(params, result) {
+    return new Promise((resolve, reject) => {
+        const { key, min_price, max_price, collection_id, category_id, sort, symbol, type } = params
+        var str = ""
+        if (key) {
+            str += ` AND items.name LIKE '%${key}%'`
+        }
+        if (min_price) {
+            str += ` AND items.price >= ${min_price}`
+        }
+        if (max_price) {
+            str += ` AND items.price <= ${max_price}`
+        }
+        if (collection_id) {
+            str += ` AND items.collection_id = ${collection_id}`
+        }
+        if (category_id) {
+            str += ` AND items.category_id = ${category_id}`
+        }
+        if (symbol) {
+            str += ` AND items.symbol = '${symbol}'`
+        }
+        if (type) {
+            str += ` AND items.type = '${type}'`
+        }
+
+        sql.query(`Select count(items.id) as total
+        from items 
+        WHERE items.sell = ${SELL} ${str}`, function (err, res) {
+            if (err) {
+                console.log("error: ", err);
+            }
+            return err ? resolve(null) : resolve(res[0].total);
+        });
+    });
+};
 Item.buyItemById = function (id, public_address) {
     return new Promise((resolve, reject) => {
         sql.query(`UPDATE items SET owner = ?, sell = ${ASSET} WHERE id = ?`, [public_address, id], function (err, res) {
@@ -188,7 +225,12 @@ Item.remove = function (id, result) {
         }
     });
 };
-Item.getFavoriteItem = function getFavoriteItem(user_id, result) {
+Item.getFavoriteItem = function getFavoriteItem(user_id,page, result) {
+    let defaultPage = 0
+    if (page) {
+        defaultPage = page
+    }
+    const offset = defaultPage * limit
     sql.query(`SELECT DISTINCT items.*, image.original_url as image_url, image.thumb_url as image_thumb_url, collections.name as collection_name 
     FROM items
     LEFT JOIN favorites
@@ -197,7 +239,9 @@ Item.getFavoriteItem = function getFavoriteItem(user_id, result) {
     ON image.id = items.image_id
     left join collections
     on items.collection_id = collections.id
-    WHERE favorites.user_id = ${user_id} AND items.sell = ${SELL}`, function (err, res) {
+    WHERE favorites.user_id = ${user_id} AND items.sell = ${SELL}
+    ORDER BY items.updated_at desc 
+    limit ${limit} OFFSET ${offset}`, function (err, res) {
         if (err) {
             console.log("error: ", err);
             result(null, err);
@@ -208,7 +252,12 @@ Item.getFavoriteItem = function getFavoriteItem(user_id, result) {
     });
 
 };
-Item.createdItems = function (public_address) {
+Item.createdItems = function (public_address, page) {
+    let defaultPage = 0
+    if (page) {
+        defaultPage = page
+    }
+    const offset = defaultPage * limit
     return new Promise((resolve, reject) => {
         sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url, collections.name as collection_name 
         from items 
@@ -216,12 +265,19 @@ Item.createdItems = function (public_address) {
         on image.id = items.image_id
         left join collections
         on items.collection_id = collections.id
-        where items.created = ? `, [public_address], function (err, res) {
+        where items.created = ? 
+        ORDER BY items.updated_at desc 
+        limit ${limit} OFFSET ${offset}`, [public_address], function (err, res) {
             return err ? resolve(null) : resolve(res);
         });
     });
 };
-Item.assetItems = function (public_address) {
+Item.assetItems = function (public_address, page) {
+    let defaultPage = 0
+    if (page) {
+        defaultPage = page
+    }
+    const offset = defaultPage * limit
     return new Promise((resolve, reject) => {
         sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url, collections.name as collection_name 
         from items 
@@ -229,12 +285,19 @@ Item.assetItems = function (public_address) {
         on image.id = items.image_id
         left join collections
         on items.collection_id = collections.id
-        where items.created != '${public_address}' and items.owner = '${public_address}' and items.sell = ${ASSET}`, function (err, res) {
+        where items.created != '${public_address}' and items.owner = '${public_address}' and items.sell = ${ASSET}
+        ORDER BY items.updated_at desc 
+        limit ${limit} OFFSET ${offset}`, function (err, res) {
             return err ? resolve(null) : resolve(res);
         });
     });
 };
-Item.resell = function (public_address) {
+Item.resell = function (public_address, page) {
+    let defaultPage = 0
+    if (page) {
+        defaultPage = page
+    }
+    const offset = defaultPage * limit
     return new Promise((resolve, reject) => {
         sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url, collections.name as collection_name 
         from items 
@@ -242,7 +305,9 @@ Item.resell = function (public_address) {
         on image.id = items.image_id
         left join collections
         on items.collection_id = collections.id
-        where items.created != '${public_address}' and items.owner = '${public_address}' and items.sell = ${SELL}`, function (err, res) {
+        where items.created != '${public_address}' and items.owner = '${public_address}' and items.sell = ${SELL}
+        ORDER BY items.updated_at desc 
+        limit ${limit} OFFSET ${offset}`, function (err, res) {
             return err ? resolve(null) : resolve(res);
         });
     });

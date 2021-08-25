@@ -1,6 +1,7 @@
 'use strict';
 var sql = require('../config/db.js');
-
+var config = require('../config/config');
+const limit = config.limit
 //role
 const ADMIN = 0
 const USER = 1
@@ -39,9 +40,30 @@ User.findByAddress = function findByAddress(address) {
         });
     });
 };
-User.getAllUser = function getAllUser(params, result) {
+User.countAllUser = function countAllUser(params, result) {
     const { start_time, end_time } = params
-    sql.query(`Select users.* from users WHERE users.created_at >= '${start_time}' AND users.created_at <= '${end_time}'`, function (err, res) {
+    return new Promise((resolve, reject) => {
+        sql.query(`Select count(users.id) as total 
+            from users 
+            WHERE users.created_at >= '${start_time}' AND users.created_at <= '${end_time}'`, function (err, res) {
+            return err ? resolve(null) : resolve(res[0].total);
+        });
+    });
+};
+User.getAllUser = function getAllUser(params, result) {
+    const { start_time, end_time, page } = params
+
+    let defaultPage = 0
+    if (page) {
+        defaultPage = page
+    }
+    const offset = defaultPage * limit
+
+    sql.query(`Select users.* 
+    from users 
+    WHERE users.created_at >= '${start_time}' AND users.created_at <= '${end_time}'
+    ORDER BY users.created_at desc
+    limit ${limit} OFFSET ${offset}`, function (err, res) {
         if (err) {
             console.log("error: ", err);
             result(null, err);

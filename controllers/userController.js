@@ -12,11 +12,12 @@ exports.list_all_user = async function (req, res) {
     const { user_id, query } = req
     var user = await User.findById(user_id);
     if (user.role == User.ADMIN) {
+        var total_items = await User.countAllUser(query)
         User.getAllUser(query, function (err, task) {
             if (err)
                 res.status(400)
                     .send({ message: "Error", data: err });
-            res.send({ message: "Success", data: task })
+            res.send({ message: "Success", data: task, total_items })
         });
     } else {
         res.status(400).send({ message: "You isn't a admin" });

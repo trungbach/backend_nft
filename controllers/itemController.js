@@ -5,18 +5,19 @@ var User = require('../models/user');
 var Transaction = require('../models/transaction');
 var File = require('../models/files');
 
-exports.list_all_item = function (req, res) {
+exports.list_all_item = async function (req, res) {
+    var total_items = await Item.countAllItem(req.query)
     Item.getAllItem(req.query, function (err, task) {
         if (err)
             res.status(400)
                 .send({ message: "Error", data: err });
-        res.send({ message: "Success", data: task })
+        res.send({ message: "Success", data: task, total_items })
     });
 };
 
 exports.list_favorite_item = function (req, res) {
-    const { user_id } = req.query
-    Item.getFavoriteItem(user_id, function (err, task) {
+    const { user_id, page } = req.query
+    Item.getFavoriteItem(user_id, page, function (err, task) {
         if (err)
             res.status(400)
                 .send({ message: "Error", data: err });
@@ -125,25 +126,23 @@ exports.resell_item = async function (req, res) {
 
 
 exports.my_items = async function (req, res) {
-    const { user_id } = req.query
+    const { user_id, page } = req.query
     var user = await User.findById(user_id);
-    var task = await Item.createdItems(user.public_address);
+    var task = await Item.createdItems(user.public_address, page);
     res.send({ message: "Success", data: task })
 };
 
 exports.my_assets = async function (req, res) {
-    const { user_id } = req.query
+    const { user_id, page } = req.query
     var user = await User.findById(user_id);
-    console.log(user.public_address)
-    var task = await Item.assetItems(user.public_address);
+    var task = await Item.assetItems(user.public_address, page);
     res.send({ message: "Success", data: task })
 };
 
 exports.resell = async function (req, res) {
-    const { user_id } = req.query
+    const { user_id, page } = req.query
     var user = await User.findById(user_id);
-    console.log(user.public_address)
-    var task = await Item.resell(user.public_address);
+    var task = await Item.resell(user.public_address, page);
     res.send({ message: "Success", data: task })
 };
 

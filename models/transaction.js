@@ -1,5 +1,7 @@
 'user strict';
 var sql = require('../config/db.js');
+var config = require('../config/config');
+const limit = config.limit
 //type
 CREATE = 0,
 BUY = 1,
@@ -37,8 +39,39 @@ Transaction.getTransactionById = function getTransactionById(transactionId, resu
         });
     });
 }
+Transaction.countAllTransaction = function countAllTransaction(params) {
+    const { start_time, end_time, user_id, item_id, symbol, page } = params
+    var str = ""
+    if (user_id) {
+        str += ` AND transactions.user_id = ${user_id}`
+    }
+    if (item_id) {
+        str += ` AND transactions.item_id = ${item_id}`
+    }
+    if (symbol) {
+        str += ` AND transactions.symbol = '${symbol}'`
+    }
+
+    return new Promise((resolve, reject) => {
+    sql.query(`SELECT count(transactions.id) as total 
+        FROM transactions
+        WHERE transactions.created_at >= '${start_time}' AND transactions.created_at <= '${end_time}' ${str}`, function (err, res) {
+            if (err) {
+                console.log("error: ", err);
+            }
+            return err ? resolve(null) : resolve(res[0].total);
+        });
+    });
+};
 Transaction.getAllTransaction = function getAllTransaction(params) {
-    const { start_time, end_time, user_id, item_id, symbol } = params
+    const { start_time, end_time, user_id, item_id, symbol, page } = params
+    
+    let defaultPage = 0
+    if (page) {
+        defaultPage = page
+    }
+    const offset = defaultPage * limit
+
     var str = ""
     if (user_id) {
         str += ` AND transactions.user_id = ${user_id}`
@@ -58,7 +91,8 @@ Transaction.getAllTransaction = function getAllTransaction(params) {
         LEFT JOIN items as item
         ON item.id = transactions.item_id
         WHERE transactions.created_at >= '${start_time}' AND transactions.created_at <= '${end_time}' ${str}
-        ORDER BY transactions.created_at desc`, function (err, res) {
+        ORDER BY transactions.created_at desc
+        limit ${limit} OFFSET ${offset}`, function (err, res) {
             return err ? resolve(null) : resolve(res);
         });
     });

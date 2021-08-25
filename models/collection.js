@@ -95,7 +95,8 @@ Collection.updateInTime = function updateInTime(params, result) {
     ON items.id = tr1.item_id
 		GROUP BY collections.id
     ${category_id ? `WHERE collections.category_id = ${category_id}` : ''}
-    ORDER BY (select count(transactions.id) from transactions WHERE transactions.created_at >= '${start_time}' AND transactions.created_at <= '${end_time}')`, function (err, res) {
+    ORDER BY (select count(transactions.id) from transactions WHERE transactions.created_at >= '${start_time}' AND transactions.created_at <= '${end_time}')
+    Limit 20`, function (err, res) {
         if (err) {
             console.log("error: ", err);
             result(null, err);
