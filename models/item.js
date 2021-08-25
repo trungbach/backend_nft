@@ -31,6 +31,7 @@ var Item = function (item) {
     this.block_id = item.block_id;
     this.sell = SELL;
     this.category_id = item.category_id
+    this.type= item.type ? item.type : File.IMAGE
 };
 Item.SELL = SELL
 Item.ASSET = ASSET
@@ -89,7 +90,7 @@ Item.getDetailItem = function getDetailItem(itemId, user_id) {
     });
 };
 Item.getAllItem = function getAllItem(params, result) {
-    const { key, min_price, max_price, collection_id, category_id, sort, symbol, page } = params
+    const { key, min_price, max_price, collection_id, category_id, sort, symbol, page, type } = params
     // limit as 20
     const limit = config.limit
     // calculate offset
@@ -117,6 +118,9 @@ Item.getAllItem = function getAllItem(params, result) {
     }
     if (symbol) {
         str += ` AND items.symbol = '${symbol}'`
+    }
+    if (type) {
+        str += ` AND items.type = '${type}'`
     }
 
     var orderBy = ""
