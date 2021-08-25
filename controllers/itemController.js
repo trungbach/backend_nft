@@ -3,6 +3,7 @@ var slug = require('slug')
 var Item = require('../models/item');
 var User = require('../models/user');
 var Transaction = require('../models/transaction');
+var File = require('../models/files');
 
 exports.list_all_item = function (req, res) {
     Item.getAllItem(req.query, function (err, task) {
@@ -25,7 +26,7 @@ exports.list_favorite_item = function (req, res) {
 
 exports.create_a_item = async function (req, res) {
     const { user_id, body } = req
-    const { name, image_id, price, symbol, collection_id, block_id, category_id } = body
+    const { name, image_id, price, symbol, collection_id, block_id, category_id, type } = body
     var user = await User.findById(user_id);
     var new_item = {
         name,
@@ -39,6 +40,7 @@ exports.create_a_item = async function (req, res) {
         category_id,
         block_id,
         sell: Item.SELL,
+        type: type ? type : File.IMAGE
     }
     let item = await Item.createItem(new_item);
     if(item == null){

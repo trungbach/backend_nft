@@ -15,6 +15,7 @@ var File = function (file) {
 File.IMAGE = IMAGE;
 File.AUDIO = AUDIO;
 File.VIDEO = VIDEO;
+File.GIF = GIF;
 File.createFile = function createFile(newFile) {
     return new Promise((resolve, reject) => {
         sql.query("INSERT INTO files set ?", newFile, function (err, res) {
