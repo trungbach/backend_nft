@@ -82,7 +82,8 @@ Collection.remove = function (id, result) {
 };
 Collection.updateInTime = function updateInTime(params, result) {
     const { start_time, end_time, category_id } = params
-    sql.query(`SELECT DISTINCT collections.*, cover.original_url as cover_url, logo.original_url as logo_url, cover.thumb_url as cover_thumb_url, logo.thumb_url as logo_thumb_url
+    sql.query(`
+    SELECT DISTINCT sum(items.price) as total, count(tr1.id) as current_transactions_count, count(items.id) as item_count, MIN(items.price) as min_price,MAX(items.price) as max_price, collections.*, cover.original_url as cover_url, logo.original_url as logo_url, cover.thumb_url as cover_thumb_url, logo.thumb_url as logo_thumb_url
     FROM collections
     LEFT JOIN items
     ON collections.id = items.collection_id
@@ -90,8 +91,11 @@ Collection.updateInTime = function updateInTime(params, result) {
     ON cover.id = collections.cover_id 
     LEFT JOIN files as logo 
     ON logo.id = collections.logo_id
+		LEFT JOIN transactions as tr1
+    ON items.id = tr1.item_id
+		GROUP BY collections.id
     ${category_id ? `WHERE collections.category_id = ${category_id}` : ''}
-    ORDER BY (select count(items.id) from items WHERE items.updated_at >= '${start_time}' AND items.updated_at <= '${end_time}')`, function (err, res) {
+    ORDER BY (select count(transactions.id) from transactions WHERE transactions.created_at >= '${start_time}' AND transactions.created_at <= '${end_time}')`, function (err, res) {
         if (err) {
             console.log("error: ", err);
             result(null, err);
