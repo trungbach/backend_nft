@@ -1,6 +1,6 @@
 'user strict';
 var sql = require('../config/db.js');
-var config = require('../config/config');
+var config = require('../public/config.json');
 const limit = config.limit
 //type
 CREATE = 0,

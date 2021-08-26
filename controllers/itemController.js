@@ -1,9 +1,11 @@
 'use strict';
 var slug = require('slug')
+var config = require('../public/config.json');
 var Item = require('../models/item');
 var User = require('../models/user');
 var Transaction = require('../models/transaction');
 var File = require('../models/files');
+const PERCENT = config.percent
 
 exports.list_all_item = async function (req, res) {
     var total_items = await Item.countAllItem(req.query)
@@ -54,7 +56,7 @@ exports.create_a_item = async function (req, res) {
             type: Transaction.CREATE,
             price,
             symbol,
-            benefit: (price * 0.01),
+            benefit: (price * PERCENT),
         }
         await Transaction.createTransaction(transaction)
         res.send({ message: "Success", data: item })
@@ -114,7 +116,7 @@ exports.resell_item = async function (req, res) {
                 type: Transaction.RESELL,
                 price: body.price,
                 symbol: item.symbol,
-                benefit: (body.price * 0.01),
+                benefit: (body.price * PERCENT),
             }
             await Transaction.createTransaction(transaction)
             res.json(task);

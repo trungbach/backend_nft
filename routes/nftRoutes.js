@@ -17,4 +17,7 @@ module.exports = function (app) {
 
     app.route('/itemnft-by-id/:id')
         .get(todoList.detail_item);
+
+    app.route('/set-config')
+        .get(todoList.detail_item);
 };

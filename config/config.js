@@ -1,1 +1,0 @@
-exports.limit = 20

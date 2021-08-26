@@ -1,6 +1,6 @@
 'user strict';
 var sql = require('../config/db.js');
-var config = require('../config/config');
+var config = require('../public/config.json');
 var slug = require('slug')
 
 const limit = config.limit
@@ -43,6 +43,9 @@ Item.MY_TOKEN = MY_TOKEN
 Item.createItem = function createItem(item) {
     return new Promise((resolve, reject) => {
         sql.query("INSERT INTO items set ?", item, function (err, res) {
+            if(err){
+                console.log(err)
+            }
             return err ? resolve(null) : resolve(res)
         });
     });

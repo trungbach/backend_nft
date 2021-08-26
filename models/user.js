@@ -1,6 +1,6 @@
 'use strict';
 var sql = require('../config/db.js');
-var config = require('../config/config');
+var config = require('../public/config.json');
 const limit = config.limit
 //role
 const ADMIN = 0
