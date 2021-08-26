@@ -3,16 +3,15 @@
 var mysql = require('mysql');
 require("dotenv").config();
 //local mysql db connection
-var connection = mysql.createConnection({
+var connection = mysql.createPool({
     host     : process.env.DB_HOST,
     user     : process.env.DB_USER,
     password : process.env.DB_PASSWORD,
     database : process.env.DB_DATABASE,
-    multipleStatements: true
 });
 // connect to database
-connection.connect(function(err) {
-    if (err) throw err;
-});
+// connection.connect(function(err) {
+//     if (err) throw err;
+// });
 
 module.exports = connection;
