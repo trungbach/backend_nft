@@ -8,6 +8,7 @@ var Category = function(category){
     this.slug = slug(category.name);
     this.logo_id = category.logo_id;
     this.cover_id = category.cover_id;
+    this.description = category.description;
 };
 Category.createCategory = function createUser(newCategory, result) {
     sql.query("INSERT INTO categories set ?", newCategory, function (err, res) {
@@ -46,7 +47,7 @@ Category.getAllCategory = function getAllCategory(result) {
     });
 };
 Category.updateById = function(id, category, result){
-    sql.query("UPDATE categories SET name = ?, slug = ?, logo_id = ?, cover_id = ? WHERE id = ?", [category.name, slug(category.name), category.logo_id, category.cover_id, id], function (err, res) {
+    sql.query("UPDATE categories SET name = ?, slug = ?, logo_id = ?, cover_id = ?, description = ? WHERE id = ?", [category.name, slug(category.name), category.logo_id, category.cover_id, category.description, id], function (err, res) {
         if(err) {
             console.log("error: ", err);
             result(null, err);

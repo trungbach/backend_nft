@@ -317,12 +317,21 @@ Item.resell = function (public_address, page) {
 };
 Item.getMostFavoriteItem = function () {
     return new Promise((resolve, reject) => {
-        sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url 
+        sql.query(`Select items.*, image.original_url as image_url, image.thumb_url as image_thumb_url, 
+        created_user.username as created_user_name, created_user.id as created_user_id,
+        sell_user.username as sell_user_name, sell_user.id as sell_user_id 
         from items 
         left join files as image
         on image.id = items.image_id
+        left join users as created_user
+        on created_user.public_address = items.created
+        left join users as sell_user
+        on sell_user.public_address = items.owner
         where items.sell = ${SELL}
         ORDER BY items.number_favorites desc LIMIT 1 `, function (err, res) {
+            if(err){
+                console.log(err)
+            }
             return err ? resolve(null) : resolve(res[0]);
         });
     });
