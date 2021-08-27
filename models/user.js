@@ -147,7 +147,7 @@ User.findByEmail = function findByEmail(email) {
 User.updateInTime = function (params, result) {
     const { start_time, end_time, category_id } = params
     sql.query(`
-    SELECT DISTINCT sum(items.price) as total, count(tr1.id) as current_transactions_count, u.username as user_name, avatar.thumb_url as avatar_url 
+    SELECT DISTINCT sum(items.price) as total, count(tr1.id) as current_transactions_count, u.username as user_name,u.id as user_id, avatar.thumb_url as avatar_url 
     FROM collections
     LEFT JOIN items
     ON collections.id = items.collection_id and items.symbol = 'ETH'
