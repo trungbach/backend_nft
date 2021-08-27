@@ -152,3 +152,12 @@ exports.summary_months_of_year = async function (req, res) {
         res.status(400).send({ message: "You isn't a admin" });
     }
 };
+
+exports.rankings = function (req, res) {
+    User.updateInTime(req.query, function (err, task) {
+        if (err)
+            res.status(400)
+                .send({ message: "Error", data: err });
+        res.send({ message: "Success", data: task })
+    });
+};

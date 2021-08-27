@@ -143,4 +143,31 @@ User.findByEmail = function findByEmail(email) {
         });
     });
 };
+
+User.updateInTime = function (params, result) {
+    const { start_time, end_time, category_id } = params
+    sql.query(`
+    SELECT DISTINCT sum(items.price) as total, count(tr1.id) as current_transactions_count, u.username as user_name, avatar.thumb_url as avatar_url 
+    FROM collections
+    LEFT JOIN items
+    ON collections.id = items.collection_id and items.symbol = 'ETH'
+    LEFT JOIN users u
+    ON u.id = collections.created
+    LEFT JOIN files as avatar 
+    ON avatar.id = u.avatar_id
+	LEFT JOIN transactions as tr1
+    ON items.id = tr1.item_id and tr1.symbol = 'ETH' and tr1.created_at >= '${start_time}' AND tr1.created_at <= '${end_time}'
+	GROUP BY u.id
+    ${category_id ? `WHERE collections.category_id = ${category_id}` : ''}
+    ORDER BY count(tr1.id) desc
+    Limit 20`, function (err, res) {
+        if (err) {
+            console.log("error: ", err);
+            result(null, err);
+        }
+        else {
+            result(null, res);
+        }
+    });
+};
 module.exports = User;
