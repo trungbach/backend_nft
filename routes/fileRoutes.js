@@ -13,19 +13,19 @@ module.exports = function (app) {
                     message: 'No file uploaded'
                 });
             } else {
-                var timestamp = new Date().getTime()
-                console.log(timestamp)
                 //Use the name of the input field (i.e. "file") to retrieve the uploaded file
                 let file = req.files.file;
-                let original_name = `${timestamp}${file.name}`
+                var original_name = optimalName(file.name)
                 //Use the mv() method to place the file in upload directory (i.e. "uploads")
-                file.mv('./public/uploads/' + file.name);
-                fs.rename(`./public/uploads/${file.name}`, `./public/uploads/${original_name}`, function(err) {
-                    if ( err ) console.log('ERROR: ' + err);
-                });
+                await file.mv('./public/uploads/' + original_name);
 
-                let thumb_name = `${timestamp}_thumb_${file.name}`
-                await sharp(file.data).resize(200, 200).toFile(`./public/uploads/${thumb_name}`);
+                let thumb_name = optimalThumbName()
+                await sharp(file.data).resize({
+                    height: 200,
+                    kernel: sharp.kernel.nearest,
+                    fit: 'contain',
+                    background: { r: 255, g: 255, b: 255, alpha: 0.5 }
+                }).toFile(`./public/uploads/${thumb_name}`);
                 
                 //save file
                 var file_id = await File.createFile(new File({
@@ -55,21 +55,21 @@ module.exports = function (app) {
                     message: 'No file uploaded'
                 });
             } else {
-                var timestamp = new Date().getTime()
                 //Use the name of the input field (i.e. "file") to retrieve the uploaded file
                 let original_file = req.files.original_file;
-                let original_name = `${timestamp}${original_file.name}`
+                var original_name = optimalName(original_file.name)
                 //Use the mv() method to place the file in upload directory (i.e. "uploads")
-                await original_file.mv('./public/uploads/' + original_file.name);
-                fs.rename(`./public/uploads/${original_file.name}`, `./public/uploads/${original_name}`, function(err) {
-                    if ( err ) console.log('ERROR: ' + err);
-                });
+                await original_file.mv('./public/uploads/' + original_name);
 
                 if(req.body.type != File.GIF){
                     let thumb_file = req.files.thumb_file;
-                    var thumb_name = `${timestamp}_thumb_${thumb_file.name}`
-                    //Use the mv() method to place the file in upload directory (i.e. "uploads")
-                    await sharp(thumb_file.data).resize(200, 200).toFile(`./public/uploads/${thumb_name}`);
+                    var thumb_name = optimalThumbName()
+                    await sharp(thumb_file.data).resize({
+                        height: 200,
+                        kernel: sharp.kernel.nearest,
+                        fit: 'contain',
+                        background: { r: 255, g: 255, b: 255, alpha: 0.5 }
+                    }).toFile(`./public/uploads/${thumb_name}`);
                 }
                 
                 //save file
@@ -91,4 +91,14 @@ module.exports = function (app) {
             res.status(500).send(err);
         }
     });
+
+    function optimalName(str){
+        var timestamp = new Date().getTime()
+        return `${timestamp}_${str.replace(/[^a-zA-Z1-9.]/g, "")}`
+    }
+
+    function optimalThumbName(){
+        var timestamp = new Date().getTime()
+        return `${timestamp}_thumb.jpeg`
+    }
 };
