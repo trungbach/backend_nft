@@ -40,7 +40,7 @@ Transaction.getTransactionById = function getTransactionById(transactionId, resu
     });
 }
 Transaction.countAllTransaction = function countAllTransaction(params) {
-    const { start_time, end_time, user_id, item_id, symbol, page } = params
+    const { start_time, end_time, user_id, item_id, symbol, type } = params
     var str = ""
     if (user_id) {
         str += ` AND transactions.user_id = ${user_id}`
@@ -50,6 +50,9 @@ Transaction.countAllTransaction = function countAllTransaction(params) {
     }
     if (symbol) {
         str += ` AND transactions.symbol = '${symbol}'`
+    }
+    if (type) {
+        str += ` AND transactions.type = '${type}'`
     }
 
     return new Promise((resolve, reject) => {
@@ -81,6 +84,9 @@ Transaction.getAllTransaction = function getAllTransaction(params) {
     }
     if (symbol) {
         str += ` AND transactions.symbol = '${symbol}'`
+    }
+    if (type) {
+        str += ` AND transactions.type = '${type}'`
     }
 
     return new Promise((resolve, reject) => {
