@@ -67,7 +67,7 @@ Transaction.countAllTransaction = function countAllTransaction(params) {
     });
 };
 Transaction.getAllTransaction = function getAllTransaction(params) {
-    const { start_time, end_time, user_id, item_id, symbol, page } = params
+    const { start_time, end_time, user_id, item_id, symbol, page, type } = params
     
     let defaultPage = 0
     if (page) {
