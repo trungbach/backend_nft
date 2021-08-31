@@ -41,17 +41,17 @@ User.findByAddress = function findByAddress(address) {
     });
 };
 User.countAllUser = function countAllUser(params, result) {
-    const { start_time, end_time } = params
+    const { start_time, end_time, key } = params
     return new Promise((resolve, reject) => {
         sql.query(`Select count(users.id) as total 
             from users 
-            WHERE users.created_at >= '${start_time}' AND users.created_at <= '${end_time}'`, function (err, res) {
+            WHERE users.created_at >= '${start_time}' AND users.created_at <= '${end_time}' ${key ? `AND users.username LIKE '%${key}%'` : ''}`, function (err, res) {
             return err ? resolve(null) : resolve(res[0].total);
         });
     });
 };
 User.getAllUser = function getAllUser(params, result) {
-    const { start_time, end_time, page } = params
+    const { start_time, end_time, page, key } = params
 
     let defaultPage = 0
     if (page) {
@@ -61,7 +61,7 @@ User.getAllUser = function getAllUser(params, result) {
 
     sql.query(`Select users.* 
     from users 
-    WHERE users.created_at >= '${start_time}' AND users.created_at <= '${end_time}'
+    WHERE users.created_at >= '${start_time}' AND users.created_at <= '${end_time}' ${key ? `AND users.username LIKE '%${key}%'` : ''}
     ORDER BY users.created_at desc
     limit ${limit} OFFSET ${offset}`, function (err, res) {
         if (err) {
