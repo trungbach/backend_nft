@@ -92,6 +92,7 @@ exports.signature_verification = async function (request, res) {
 exports.update_profile = async function (request, res) {
     const { username, avatar_id, cover_id, description, email } = request.body;
     var user = await User.updateProfile(request.user_id, username, avatar_id, cover_id, description, email);
+    user = await User.getProfileById(request.user_id)
     res.send({ message: "Success", data: user })
 };
 

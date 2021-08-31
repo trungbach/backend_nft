@@ -138,7 +138,7 @@ User.getUserInMonthsOfYear = function (mindate) {
 };
 User.findByEmail = function findByEmail(email) {
     return new Promise((resolve, reject) => {
-        sql.query("Select * from users where email = ? ", email, function (err, res) {
+        sql.query("Select users.*, cover.original_url as cover_url, avatar.original_url as avatar_url, cover.thumb_url as cover_thumb_url, avatar.thumb_url as avatar_thumb_url from users left join files as cover on cover.id = users.cover_id left join files as avatar on avatar.id = users.avatar_id  where users.email = ? ", email, function (err, res) {
             return err ? resolve(null) : resolve(res.length > 0 ? res[0] : null);
         });
     });
