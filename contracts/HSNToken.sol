@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 
 /**
  * @title HSNToken
@@ -10,12 +10,17 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  * `ERC20` functions.
  */
 
-contract HSNToken is ERC20 {
-    constructor() ERC20("HSNToken", "HSN") {
+contract HSNToken is ERC20Upgradeable {
+    address payable owner;
+
+    function initialize() public initializer {
+        __ERC20_init("HSNToken", "HSN");
+        owner = payable(msg.sender);
         _mint(msg.sender, 1000000000 * (10 ** uint256(decimals())));
     }
 
     function mintMinerReward() public {
+        require(payable(msg.sender) == owner, "You aren't an admin");
         _mint(block.coinbase, 1000);
     }
 }

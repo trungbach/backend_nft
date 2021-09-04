@@ -1,18 +1,19 @@
-const hre = require("hardhat");
+const { ethers, upgrades } = require("hardhat");
 const fs = require('fs');
 
 async function main() {
-  const HSNToken = await hre.ethers.getContractFactory("HSNToken");
-  const hsn = await HSNToken.deploy();
+  const HSNToken = await ethers.getContractFactory("HSNToken");
+  const hsn = await upgrades.deployProxy(HSNToken, [], { initializer: 'initialize' });
   await hsn.deployed();
   console.log("hsn deployed to:", hsn.address);
 
-  const NFTMarket = await hre.ethers.getContractFactory("NFTMarket");
-  const nftMarket = await NFTMarket.deploy(hsn.address);
+
+  const NFTMarket = await ethers.getContractFactory("NFTMarket");
+  const nftMarket = await upgrades.deployProxy(NFTMarket, [], { initializer: 'initialize' });
   await nftMarket.deployed();
   console.log("nftMarket deployed to:", nftMarket.address);
 
-  const NFT = await hre.ethers.getContractFactory("NFT");
+  const NFT = await ethers.getContractFactory("NFT");
   const nft = await NFT.deploy(nftMarket.address);
   await nft.deployed();
   console.log("nft deployed to:", nft.address);

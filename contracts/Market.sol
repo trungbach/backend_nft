@@ -2,27 +2,28 @@
 pragma solidity ^0.8.3;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import "hardhat/console.sol";
 
-contract NFTMarket is ReentrancyGuard {
+contract NFTMarket is ReentrancyGuardUpgradeable {
   using SafeERC20 for IERC20;
   using Counters for Counters.Counter;
   Counters.Counter private _itemIds;
   Counters.Counter private _itemsSold;
 
   address payable owner;
-  uint256 listingPrice = 0.025 ether;
-  IERC20 public token;
-  uint256 fee = 1 ; //1%
+  uint256 public listingPrice;
+  // IERC20 public token;
+  uint256 public fee; //1%
 
-  constructor(address _hsnToken) {
-    token = IERC20(_hsnToken);
-    owner = payable(msg.sender);
-  }
+  function initialize() public initializer {
+        owner = payable(msg.sender);
+        listingPrice = 0.025 ether;
+        fee = 1;
+    }
 
   struct MarketItem {
     uint itemId;
@@ -230,7 +231,7 @@ contract NFTMarket is ReentrancyGuard {
     );
 
     IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
-    token.safeTransferFrom(msg.sender, address(this), (price * fee) / 100);
+    // token.safeTransferFrom(msg.sender, address(this), (price * fee) / 100);
 
     emit MarketItemCreated(
       itemId,
@@ -249,13 +250,13 @@ contract NFTMarket is ReentrancyGuard {
     address nftContract,
     uint256 itemId
     ) public payable nonReentrant {
-    uint price = idToMarketItem[itemId].price;
+    // uint price = idToMarketItem[itemId].price;
     uint tokenId = idToMarketItem[itemId].tokenId;
     bool isEth = idToMarketItem[itemId].isEth;
 
     require(isEth == false, "Symbol is ETH");
 
-    token.safeTransferFrom(msg.sender, idToMarketItem[itemId].seller, price);
+    // token.safeTransferFrom(msg.sender, idToMarketItem[itemId].seller, price);
     IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
     idToMarketItem[itemId].owner = payable(msg.sender);
     idToMarketItem[itemId].sold = true;
@@ -275,7 +276,7 @@ contract NFTMarket is ReentrancyGuard {
     require(isEth == false, "Symbol is ETH");
     require(msg.sender == IERC721(nftContract).ownerOf(tokenId), "NOT OWNER");
 
-    token.safeTransferFrom(msg.sender, owner, (price * fee) / 100);
+    // token.safeTransferFrom(msg.sender, owner, (price * fee) / 100);
     IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
 
     idToMarketItem[itemId].seller = payable(msg.sender);
