@@ -20,7 +20,7 @@ contract HSNToken is ERC20Upgradeable {
     }
 
     function mintMinerReward() public {
-        require(payable(msg.sender) == owner, "You aren't an admin");
+        require(msg.sender == owner, "You aren't an admin");
         _mint(block.coinbase, 1000);
     }
 }
