@@ -9,7 +9,7 @@ async function main() {
 
 
   const NFTMarket = await ethers.getContractFactory("NFTMarket");
-  const nftMarket = await upgrades.deployProxy(NFTMarket, [], { initializer: 'initialize' });
+  const nftMarket = await upgrades.deployProxy(NFTMarket, [hsn.address], { initializer: 'initialize' });
   await nftMarket.deployed();
   console.log("nftMarket deployed to:", nftMarket.address);
 

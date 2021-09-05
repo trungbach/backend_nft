@@ -16,13 +16,14 @@ contract NFTMarket is ReentrancyGuardUpgradeable {
 
   address payable owner;
   uint256 public listingPrice;
-  // IERC20 public token;
-  uint256 public fee; //1%
+  IERC20 public token;
+  uint256 public fee;
 
-  function initialize() public initializer {
+  function initialize(address hsnToken) public initializer {
         owner = payable(msg.sender);
         listingPrice = 0.025 ether;
         fee = 1;
+        token = IERC20(hsnToken);
     }
 
   struct MarketItem {
@@ -231,7 +232,7 @@ contract NFTMarket is ReentrancyGuardUpgradeable {
     );
 
     IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
-    // token.safeTransferFrom(msg.sender, address(this), (price * fee) / 100);
+    token.safeTransferFrom(msg.sender, address(this), (price * fee) / 100);
 
     emit MarketItemCreated(
       itemId,
@@ -250,13 +251,13 @@ contract NFTMarket is ReentrancyGuardUpgradeable {
     address nftContract,
     uint256 itemId
     ) public payable nonReentrant {
-    // uint price = idToMarketItem[itemId].price;
+    uint price = idToMarketItem[itemId].price;
     uint tokenId = idToMarketItem[itemId].tokenId;
     bool isEth = idToMarketItem[itemId].isEth;
 
     require(isEth == false, "Symbol is ETH");
 
-    // token.safeTransferFrom(msg.sender, idToMarketItem[itemId].seller, price);
+    token.safeTransferFrom(msg.sender, idToMarketItem[itemId].seller, price);
     IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
     idToMarketItem[itemId].owner = payable(msg.sender);
     idToMarketItem[itemId].sold = true;
@@ -276,7 +277,7 @@ contract NFTMarket is ReentrancyGuardUpgradeable {
     require(isEth == false, "Symbol is ETH");
     require(msg.sender == IERC721(nftContract).ownerOf(tokenId), "NOT OWNER");
 
-    // token.safeTransferFrom(msg.sender, owner, (price * fee) / 100);
+    token.safeTransferFrom(msg.sender, owner, (price * fee) / 100);
     IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
 
     idToMarketItem[itemId].seller = payable(msg.sender);
