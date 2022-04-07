@@ -232,7 +232,7 @@ contract NFTMarket is ReentrancyGuardUpgradeable {
     );
 
     IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
-    token.safeTransferFrom(msg.sender, address(this), (price * fee) / 100);
+    token.transferFrom(msg.sender, address(this), (price * fee) / 100);
 
     emit MarketItemCreated(
       itemId,
