@@ -73,6 +73,14 @@ exports.read_a_item = async function (req, res) {
     res.json(task);
 };
 
+exports.read_a_item_no_token = async function (req, res) {
+    const { params } = req
+    var task = await Item.getDetailItemNoToken(params.itemId);
+    if (task == null)
+        res.status(400)
+            .send({ message: "Error" });
+    res.json(task);
+};
 
 exports.buy_item = async function (req, res) {
     const { user_id, params } = req

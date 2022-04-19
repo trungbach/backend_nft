@@ -1,4 +1,12 @@
 {
     "limit": 20,
-    "percent": 0.01
+    "percent": 0.01,
+    "address": [
+        {
+            "address": "0x6cd7eda1a5f8407d85801ae26c8b87a79844840d"
+        },
+        {
+            "address": "0xE6eC5b70FdC15c2ae62592B1418474ee029bb6Ce"
+        }
+    ]
 }

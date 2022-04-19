@@ -11,6 +11,9 @@ module.exports = function (app) {
     app.route('/items/:itemId')
         .get(auth, todoList.read_a_item);
 
+    app.route('/detail-item/:itemId')
+        .get(todoList.read_a_item_no_token);
+
     app.route('/buy-item/:itemId')
         .put(auth, todoList.buy_item);
 
