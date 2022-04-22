@@ -52,7 +52,7 @@ exports.check_public_address = async function (request, res) {
     const { public_address } = request.body;
     var exist = false
     config.address.forEach(address => {
-        if(address.address == public_address){
+        if(address.address.toUpperCase() == public_address.toUpperCase()){
             exist = true
         }
     });
