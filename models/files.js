@@ -5,6 +5,9 @@ IMAGE = 0;
 AUDIO = 1;
 VIDEO = 2;
 GIF = 3;
+DOCUMENT = 4;
+PDF = 5;
+
 //Category object constructor
 var File = function (file) {
     this.original_url = file.original_url;
