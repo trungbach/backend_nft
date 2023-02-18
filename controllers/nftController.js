@@ -9,7 +9,8 @@ const NFT = require('../artifacts/contracts/NFT.sol/NFT.json');
 const Market = require('../artifacts/contracts/Market.sol/NFTMarket.json');
 
 exports.list_all_items = async function (req, res) {
-    const provider = new ethers.getDefaultProvider(`https://ropsten.infura.io/v3/${process.env.INFURA_ID}`)
+    const provider = new ethers.getDefaultProvider(`https://eth-goerli.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}}`)
+
     const tokenContract = new ethers.Contract(config.nftaddress, NFT.abi, provider)
     const marketContract = new ethers.Contract(config.nftmarketaddress, Market.abi, provider)
     const data = await marketContract.fetchMarketItems()
@@ -35,7 +36,7 @@ exports.list_all_items = async function (req, res) {
 
 exports.create_item = async function (req, res) {
     const { address, url, price, symbol } = req.body
-    const provider = new ethers.getDefaultProvider(`https://ropsten.infura.io/v3/${process.env.INFURA_ID}`)
+    const provider = new ethers.getDefaultProvider(`https://eth-goerli.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}}`)
     const signer = provider.getSigner(address) 
     let contract = new ethers.Contract(config.nftaddress, NFT.abi, signer)
     let transaction = await contract.createToken(url)
@@ -58,7 +59,7 @@ exports.create_item = async function (req, res) {
 
 exports.list_item_created = async function (req, res) {
     const { address } = req.body
-    const provider = new ethers.getDefaultProvider(`https://ropsten.infura.io/v3/${process.env.INFURA_ID}`)
+    const provider = new ethers.getDefaultProvider(`https://eth-goerli.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}}`)
     const signer = provider.getSigner(address) 
     const marketContract = new ethers.Contract(config.nftmarketaddress, Market.abi, signer)
     const tokenContract = new ethers.Contract(config.nftaddress, NFT.abi, provider)
@@ -84,7 +85,8 @@ exports.list_item_created = async function (req, res) {
 
 exports.list_item_bought = async function (req, res) {
     const { address } = req.body
-    const provider = new ethers.getDefaultProvider(`https://ropsten.infura.io/v3/${process.env.INFURA_ID}`)
+    // const provider = new ethers.getDefaultProvider(`https://ropsten.infura.io/v3/${process.env.INFURA_ID}`)
+    const provider = new ethers.getDefaultProvider(`https://eth-goerli.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`)
     const signer = provider.getSigner(address) 
     const marketContract = new ethers.Contract(config.nftmarketaddress, Market.abi, signer)
     const tokenContract = new ethers.Contract(config.nftaddress, NFT.abi, provider)
@@ -109,12 +111,14 @@ exports.list_item_bought = async function (req, res) {
 
 exports.detail_item = async function (req, res) {
     var id = req.params.id
-    const provider = new ethers.getDefaultProvider(`https://ropsten.infura.io/v3/${process.env.INFURA_ID}`)
+    const provider = new ethers.getDefaultProvider(`https://eth-goerli.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`)
     const tokenContract = new ethers.Contract(config.nftaddress, NFT.abi, provider)
     const marketContract = new ethers.Contract(config.nftmarketaddress, Market.abi, provider)
-    const data = await marketContract.fetchDetailItem(id)
-
-    const tokenUri = await tokenContract.tokenURI(data.tokenId)
+    const data = await marketContract.fetchDetailItem(Number(id))
+    let tokenUri = await tokenContract.tokenURI(data.tokenId)
+    const tokenUriArr = tokenUri.split('/');
+    const tokenUriKey = tokenUriArr[tokenUriArr.length - 1]
+    tokenUri = `https://chris-anatalio.infura-ipfs.io/ipfs/${tokenUriKey}`
     const meta = await axios.get(tokenUri)
     let price = ethers.utils.formatUnits(data.price.toString(), 'ether')
     let item = {
@@ -126,5 +130,7 @@ exports.detail_item = async function (req, res) {
         name: meta.data.name,
         description: meta.data.description,
     }
+    console.log('item', item)
     res.send({ message: "Success", data: item })
+    // res.send({ message: "Success", data: {} })
 };

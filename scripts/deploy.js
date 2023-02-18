@@ -1,6 +1,6 @@
 const { ethers, upgrades } = require("hardhat");
 const fs = require('fs');
-
+require('@openzeppelin/hardhat-upgrades');
 async function main() {
   const HSNToken = await ethers.getContractFactory("HSNToken");
   const hsn = await upgrades.deployProxy(HSNToken, [], { initializer: 'initialize' });

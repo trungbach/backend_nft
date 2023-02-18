@@ -14,7 +14,7 @@ contract HSNToken is ERC20Upgradeable {
     address payable owner;
 
     function initialize() public initializer {
-        __ERC20_init("HSNToken", "HSN");
+        __ERC20_init("BVT", "BVT");
         owner = payable(msg.sender);
         _mint(msg.sender, 1000000000 * (10 ** uint256(decimals())));
     }

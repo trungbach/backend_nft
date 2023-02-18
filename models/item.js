@@ -18,7 +18,7 @@ const OLDEST_SORT = 5
 
 //symbol
 const ETH = "ETH"
-const MY_TOKEN = "HSN"
+const MY_TOKEN = "BVT"
 //Item object constructor
 var Item = function (item) {
     this.name = item.name;

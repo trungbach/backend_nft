@@ -51,15 +51,15 @@ exports.token_by_address = async function (request, res) {
 exports.check_public_address = async function (request, res) {
     const { public_address } = request.body;
     var exist = false
-    config.address.forEach(address => {
-        if(address.address.toUpperCase() == public_address.toUpperCase()){
-            exist = true
-        }
-    });
-    if (exist == false){
-        res.status(400).send({ message: "You can't access" });
-        return
-    }
+    // config.address.forEach(address => {
+    //     if(address.address.toUpperCase() == public_address.toUpperCase()){
+    //         exist = true
+    //     }
+    // });
+    // if (exist == false){
+    //     res.status(400).send({ message: "You can't access" });
+    //     return
+    // }
     const user = await User.findByAddress(public_address);
     if (user) {
         res.send({ message: "Success", data: user })

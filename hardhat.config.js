@@ -1,11 +1,12 @@
 require("@nomiclabs/hardhat-waffle");
+require('@openzeppelin/hardhat-upgrades');
+
 require("dotenv").config();
-const fs = require('fs');
 const privateKey = process.env.ACCOUNT.trim() || "01234567890123456789";
 
 // infuraId is optional if you are using Infura RPC
 const infuraId = process.env.INFURA_ID.trim() || "";
-
+const ALCHEMY_API_KEY = 'ypetA5pcywOjDD6-dskWbc29N7z0Ettj'
 module.exports = {
   defaultNetwork: "hardhat",
   networks: {
@@ -28,6 +29,12 @@ module.exports = {
       // Infura
       url: `https://ropsten.infura.io/v3/${infuraId}`,
       // url: "https://rpc-mumbai.matic.today",
+      accounts: [privateKey],
+    },
+    goerli: {
+      // Infura goerli
+      // url: `https://goerli.infura.io/v3/${infuraId}`,
+      url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
       accounts: [privateKey],
     },
     binancetest: {

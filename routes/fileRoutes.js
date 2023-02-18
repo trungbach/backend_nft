@@ -143,13 +143,15 @@ module.exports = function (app) {
                 await file.mv('./public/uploads/images/' + original_name);
 
                 let thumb_name = optimalThumbName()
+                console.log('chua ok')
+
                 await sharp(file.data).resize({
                     height: 200,
                     kernel: sharp.kernel.nearest,
                     fit: 'contain',
                     background: { r: 255, g: 255, b: 255, alpha: 0.5 }
                 }).toFile(`./public/uploads/thumbs/${thumb_name}`);
-                
+                console.log('ok')
                 //save file
                 var file_id = await File.createFile(new File({
                     original_url: `${req.protocol}://${req.get('host')}/public/uploads/images/${original_name}`,

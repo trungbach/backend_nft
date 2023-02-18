@@ -7,7 +7,9 @@
     "hardhat-test": "npx hardhat test",
     "hardhat-node": "npx hardhat node",
     "start": "nodemon server.js",
-    "seed": "node config/seed.js"
+    "seed": "node config/seed.js",
+    "deploy-bsctest": "npx hardhat run scripts/deploy.js --network binancetest",
+    "deploy-goerli": "npx hardhat run scripts/deploy.js --network goerli"
   },
   "author": "",
   "license": "ISC",
@@ -18,6 +20,7 @@
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "^4.2.0",
     "@openzeppelin/contracts-upgradeable": "^4.3.1",
+    "@openzeppelin/hardhat-upgrades": "^1.22.1",
     "axios": "^0.21.1",
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
