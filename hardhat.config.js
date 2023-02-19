@@ -34,6 +34,7 @@ module.exports = {
     goerli: {
       // Infura goerli
       // url: `https://goerli.infura.io/v3/${infuraId}`,
+      // https://chris-anatalio.infura-ipfs.io/ipfs
       url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
       accounts: [privateKey],
     },

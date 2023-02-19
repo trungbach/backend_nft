@@ -1,6 +1,6 @@
 'user strict';
 
-var mysql = require('mysql');
+var mysql = require('mysql2');
 require("dotenv").config();
 //local mysql db connection
 var connection = mysql.createPool({
